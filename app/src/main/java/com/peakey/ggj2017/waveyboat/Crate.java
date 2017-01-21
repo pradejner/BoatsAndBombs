@@ -7,6 +7,8 @@ import android.graphics.Rect;
 import android.renderscript.Double2;
 import android.util.Log;
 
+import java.util.ArrayList;
+
 /**
  * Created by peakeyAdmin on 1/20/2017.
  */
@@ -14,6 +16,12 @@ import android.util.Log;
 public class Crate
 {
 
+    public interface SplashedHandler{
+        void callback(Crate crate);
+    }
+
+
+    private ArrayList<SplashedHandler> lstSplashedHandlers;
 
     private static final String TAG = Crate.class.getSimpleName();
     private static final float GRAVITY_ACCELERATION = 9.8f; //M/S^2
@@ -55,6 +63,11 @@ public class Crate
         velocityY = 0;
         velocityX = 0;
         blnOnBoat = true;
+        lstSplashedHandlers = new ArrayList<SplashedHandler>();
+    }
+
+    public void addSplashedHandler(SplashedHandler observer){
+        lstSplashedHandlers.add(observer);
     }
 
     public Bitmap getBitmap() {
@@ -140,7 +153,7 @@ public class Crate
 
         }
 
-        //Log.d("CRATE", Double.toString( velocityY) );
+//        Log.d("CRATE", Double.toString( velocityY) );
 
         //assume boxes are 1 meter squares
         y += velocityY;
@@ -149,6 +162,13 @@ public class Crate
         Rect destRect = new Rect((int)x, (int)y, (int)x + spriteWidth, (int)y + spriteHeight);
         canvas.drawBitmap(bitmap, sourceRect, destRect, null);
 
+
+        if (y > canvas.getHeight())
+        {
+            for (SplashedHandler splashHandler:lstSplashedHandlers){
+                splashHandler.callback(this);
+            }
+        }
         lastTime = currentTime;
     }
 

@@ -9,6 +9,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
@@ -55,13 +56,34 @@ public class GameView extends View {
         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.woodencrate);
         bitmap = Bitmap.createScaledBitmap(bitmap, 60, 60, false);
 
-        crates.add(new Crate(bitmap, 0, 0, 5, 0, 0, 0));
+        Crate crate = new Crate(bitmap, 0, 0, 5, 0, 0, 0);
+        crate.addSplashedHandler(new Crate.SplashedHandler() {
+            @Override
+            public void callback(Crate crate){
+                CrateSplashed(crate);
+            }
+        });
+        crates.add(crate);
+
+        crate = new Crate(bitmap, 300, 0, 5, 0, 0, 0);
+        crate.addSplashedHandler(new Crate.SplashedHandler() {
+            @Override
+            public void callback(Crate crate){
+                CrateSplashed(crate);
+            }
+        });        crates.add(crate);
 
         thdGameLoop = new GameLoopThread(this);
         Resume();
         thdGameLoop.start();
     }
 
+
+    private void CrateSplashed(Crate crate)
+    {
+        Log.d("CRATE", "NOW" );
+        crates.remove(crate);
+    }
 
     public void Destroy()
     {
@@ -79,19 +101,16 @@ public class GameView extends View {
     public void Pause()
     {
         thdGameLoop.setRunning(false);
-        //mWaveHelper.cancel();
     }
 
 
     public void Resume()
     {
         thdGameLoop.setRunning(true);
-        //mWaveHelper.start();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        //canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
         drawBackwave(canvas);
         drawBoat(canvas);
         drawFrontWave(canvas);
@@ -119,8 +138,8 @@ public class GameView extends View {
 
     private void drawCrates(Canvas canvas)
     {
-        for(Iterator<Crate> i = crates.iterator(); i.hasNext(); ) {
-            Crate item = i.next();
+        for(int i = crates.size() - 1; i >= 0; i-- ) {
+            Crate item = crates.get(i);
             item.draw(canvas);
         }
     }

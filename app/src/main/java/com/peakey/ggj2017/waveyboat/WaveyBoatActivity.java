@@ -43,7 +43,7 @@ public class WaveyBoatActivity extends AppCompatActivity {
         backgroundWaveHelper = new WaveHelper(backgroundWaveView);
         middleWaveHelper = new WaveHelper(middleWaveView);
         frontWaveHelper = new WaveHelper(frontWaveView);
-        
+
          game = (GameView) findViewById(R.id.game);
     }
 
