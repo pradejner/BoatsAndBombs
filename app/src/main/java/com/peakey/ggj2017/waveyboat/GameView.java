@@ -50,14 +50,14 @@ public class GameView extends View {
     {
         bombs = new ArrayList<>();
 
-        bmpCrate = BitmapFactory.decodeResource(context.getResources(), R.mipmap.woodencrate);
+        bmpCrate = BitmapFactory.decodeResource(context.getResources(), R.mipmap.dynamite);
         bmpCrate = Bitmap.createScaledBitmap(bmpCrate, 60, 60, false);
 
         Bomb crate = new Bomb(bmpCrate, 0, 0);
         crate.addSplashedHandler(new Bomb.SplashedHandler() {
             @Override
-            public void callback(Bomb crate){
-                CrateSplashed(crate);
+            public void callback(Bomb bomb){
+                BombSplashed(bomb);
             }
         });
         bombs.add(crate);
@@ -65,8 +65,8 @@ public class GameView extends View {
         crate = new Bomb(bmpCrate, 300, 0);
         crate.addSplashedHandler(new Bomb.SplashedHandler() {
             @Override
-            public void callback(Bomb crate){
-                CrateSplashed(crate);
+            public void callback(Bomb bomb){
+                BombSplashed(bomb);
             }
         });
         bombs.add(crate);
@@ -77,10 +77,10 @@ public class GameView extends View {
     }
 
 
-    private void CrateSplashed(Bomb crate)
+    private void BombSplashed(Bomb bomb)
     {
         //Log.d("CRATE", "NOW" );
-        bombs.remove(crate);
+        bombs.remove(bomb);
 
         DisplayMetrics displaymetrics = new DisplayMetrics();
         WindowManager man = (WindowManager)this.context.getSystemService(context.WINDOW_SERVICE);
@@ -88,14 +88,14 @@ public class GameView extends View {
          Point size = new Point();
          display.getSize(size);
         int MaxWidth = size.x - bmpCrate.getWidth();
-        crate = new Bomb(bmpCrate, (int)(Math.random() * MaxWidth), 0);
-        crate.addSplashedHandler(new Bomb.SplashedHandler() {
+        bomb = new Bomb(bmpCrate, (int)(Math.random() * MaxWidth), 0);
+        bomb.addSplashedHandler(new Bomb.SplashedHandler() {
             @Override
             public void callback(Bomb crate){
-                CrateSplashed(crate);
+                BombSplashed(crate);
             }
         });
-        bombs.add(crate);
+        bombs.add(bomb);
     }
 
     public void Destroy()
