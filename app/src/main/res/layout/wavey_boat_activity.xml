@@ -16,15 +16,22 @@
     <com.peakey.ggj2017.waveyboat.WaveView
         android:id="@+id/middle_wave"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="90dp"
         android:layout_marginTop="180dp"
         android:layout_centerHorizontal="true"/>
 
     <com.peakey.ggj2017.waveyboat.WaveView
         android:id="@+id/front_wave"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_marginTop="210dp"
+        android:layout_height="130dp"
+        android:layout_marginTop="190dp"
+        android:layout_centerHorizontal="true"/>
+
+    <ImageView
+        android:id="@+id/boat_image"
+        android:layout_width="240dp"
+        android:layout_height="240dp"
+        android:layout_marginTop="130dp"
         android:layout_centerHorizontal="true"/>
 
     <com.peakey.ggj2017.waveyboat.GameView

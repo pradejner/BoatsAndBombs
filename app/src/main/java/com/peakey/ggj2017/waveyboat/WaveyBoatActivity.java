@@ -3,6 +3,7 @@ package com.peakey.ggj2017.waveyboat;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.ImageView;
 
 public class WaveyBoatActivity extends AppCompatActivity {
     private WaveView backgroundWaveView;
@@ -12,7 +13,8 @@ public class WaveyBoatActivity extends AppCompatActivity {
     private WaveHelper backgroundWaveHelper;
     private WaveHelper middleWaveHelper;
     private WaveHelper frontWaveHelper;
-
+    
+    private ImageView boatImage;
     private GameView game;
 
     private int borderColor = Color.parseColor("#44FFFFFF");
@@ -25,6 +27,9 @@ public class WaveyBoatActivity extends AppCompatActivity {
         backgroundWaveView = (WaveView) findViewById(R.id.background_wave);
         middleWaveView = (WaveView) findViewById(R.id.middle_wave);
         frontWaveView = (WaveView) findViewById(R.id.front_wave);
+        boatImage = (ImageView) findViewById(R.id.boat_image);
+
+        boatImage.setImageResource(R.mipmap.boat);
 
         setAttributesOfWave(backgroundWaveView);
         setAttributesOfWave(middleWaveView);
@@ -38,6 +43,7 @@ public class WaveyBoatActivity extends AppCompatActivity {
         middleWaveView.setWaveLengthRatio(.2f);
         frontWaveView.setWaveLengthRatio(.15f);
 
+        middleWaveView.bringToFront();
         frontWaveView.bringToFront();
 
         backgroundWaveHelper = new WaveHelper(backgroundWaveView);
