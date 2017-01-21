@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -25,7 +26,16 @@ public class GameView extends View {
     private List<Bomb> bombs;
     private Context context;
     private GameLoopThread thdGameLoop;
-    private Bitmap bmpCrate;
+
+    private Bitmap bmpBomb;
+
+    private Boolean blnPlaneMovingRight = true;
+    private float fltPlaneRate = 10;
+    private float fltBombLikelyHood = 0.99f;
+    private Bitmap bmpPlane;
+    Rect rctPlaneSource;
+    Rect rctPlaneDest;
+
 
     public GameView(Context context) {
         super(context);
@@ -50,26 +60,13 @@ public class GameView extends View {
     {
         bombs = new ArrayList<>();
 
-        bmpCrate = BitmapFactory.decodeResource(context.getResources(), R.mipmap.dynamite);
-        bmpCrate = Bitmap.createScaledBitmap(bmpCrate, 60, 60, false);
+        bmpBomb = BitmapFactory.decodeResource(context.getResources(), R.mipmap.dynamite);
+        bmpBomb = Bitmap.createScaledBitmap(bmpBomb, 60, 60, false);
 
-        Bomb crate = new Bomb(bmpCrate, 0, 0);
-        crate.addSplashedHandler(new Bomb.SplashedHandler() {
-            @Override
-            public void callback(Bomb bomb){
-                BombSplashed(bomb);
-            }
-        });
-        bombs.add(crate);
-
-        crate = new Bomb(bmpCrate, 300, 0);
-        crate.addSplashedHandler(new Bomb.SplashedHandler() {
-            @Override
-            public void callback(Bomb bomb){
-                BombSplashed(bomb);
-            }
-        });
-        bombs.add(crate);
+        bmpPlane = BitmapFactory.decodeResource(context.getResources(), R.mipmap.plane);
+        bmpPlane = Bitmap.createScaledBitmap(bmpPlane, 100, 100, false);
+        rctPlaneSource = new Rect(0, 0, bmpPlane.getWidth(), bmpPlane.getHeight());
+        rctPlaneDest = new Rect(0, 0, bmpPlane.getWidth(), bmpPlane.getHeight());
 
         thdGameLoop = new GameLoopThread(this);
         Resume();
@@ -81,21 +78,6 @@ public class GameView extends View {
     {
         //Log.d("CRATE", "NOW" );
         bombs.remove(bomb);
-
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        WindowManager man = (WindowManager)this.context.getSystemService(context.WINDOW_SERVICE);
-        Display display = man.getDefaultDisplay();
-         Point size = new Point();
-         display.getSize(size);
-        int MaxWidth = size.x - bmpCrate.getWidth();
-        bomb = new Bomb(bmpCrate, (int)(Math.random() * MaxWidth), 0);
-        bomb.addSplashedHandler(new Bomb.SplashedHandler() {
-            @Override
-            public void callback(Bomb crate){
-                BombSplashed(crate);
-            }
-        });
-        bombs.add(bomb);
     }
 
     public void Destroy()
@@ -124,30 +106,65 @@ public class GameView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        drawBackwave(canvas);
-        drawBoat(canvas);
-        drawFrontWave(canvas);
+        drawPlane(canvas);
         drawBombs(canvas);
     }
 
 
-    private void drawBackwave(Canvas canvas)
-    {
 
+    private void drawPlane(Canvas canvas)
+    {
+        Boolean blnCanBomb = true;
+        if (blnPlaneMovingRight) {
+            rctPlaneDest.left += fltPlaneRate;
+            rctPlaneDest.right = rctPlaneDest.left + bmpPlane.getWidth();
+            if (rctPlaneDest.left > canvas.getWidth())
+            {
+                blnCanBomb = false;
+                if (rctPlaneDest.left > (canvas.getWidth() + bmpPlane.getWidth()))
+                {
+                    blnPlaneMovingRight = false;
+                }
+            }
+        }
+        else
+        {
+            rctPlaneDest.left -= fltPlaneRate;
+            rctPlaneDest.right = rctPlaneDest.left - bmpPlane.getWidth();
+            if (rctPlaneDest.left < 0)
+            {
+                blnCanBomb = false;
+                if (rctPlaneDest.left < -bmpPlane.getWidth())
+                {
+                    blnPlaneMovingRight = true;
+                }
+            }
+        }
+        canvas.drawBitmap(bmpPlane, rctPlaneSource, rctPlaneDest, null);
+        if (Math.random() > fltBombLikelyHood)
+        {
+            addBomb();
+        }
     }
 
 
-    private void drawBoat(Canvas canvas)
+    private void addBomb()
     {
-
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        WindowManager man = (WindowManager)this.context.getSystemService(context.WINDOW_SERVICE);
+        Display display = man.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int MaxWidth = size.x - bmpBomb.getWidth();
+        Bomb bomb = new Bomb(bmpBomb, rctPlaneDest.left, 0);
+        bomb.addSplashedHandler(new Bomb.SplashedHandler() {
+            @Override
+            public void callback(Bomb crate){
+                BombSplashed(crate);
+            }
+        });
+        bombs.add(bomb);
     }
-
-
-    private void drawFrontWave(Canvas canvas)
-    {
-
-    }
-
 
     private void drawBombs(Canvas canvas)
     {
