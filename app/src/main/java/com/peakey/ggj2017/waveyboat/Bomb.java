@@ -2,10 +2,7 @@ package com.peakey.ggj2017.waveyboat;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Rect;
-import android.renderscript.Double2;
-import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -13,17 +10,17 @@ import java.util.ArrayList;
  * Created by peakeyAdmin on 1/20/2017.
  */
 
-public class Crate
+public class Bomb
 {
 
     public interface SplashedHandler{
-        void callback(Crate crate);
+        void callback(Bomb bomb);
     }
 
 
     private ArrayList<SplashedHandler> lstSplashedHandlers;
 
-    private static final String TAG = Crate.class.getSimpleName();
+    private static final String TAG = Bomb.class.getSimpleName();
     private static final float GRAVITY_ACCELERATION = 9.8f; //M/S^2
 
     private Bitmap bitmap;		// the animation sequence
@@ -35,18 +32,11 @@ public class Crate
     private float x;				// the X coordinate of the object (top left of the image)
     private float y;				// the Y coordinate of the object (top left of the image)
 
-    private float fltGravityForce;
-    private boolean blnOnBoat;
-    private float fltCoefficientOfFriction;
-    private float fltFriction;
-    private float fltMass;
-    private float fltAngle;
     private long lastTime;
-    private float velocityX;
     private float velocityY;
 
 
-    public Crate(Bitmap bitmap, float x, float y, float Mass, float CoefficientOfFriction, float Friction, float Angle)
+    public Bomb(Bitmap bitmap, float x, float y )
     {
         this.bitmap = bitmap;
         this.x = x;
@@ -54,15 +44,8 @@ public class Crate
         spriteWidth = bitmap.getWidth();
         spriteHeight = bitmap.getHeight();
         sourceRect = new Rect(0, 0, spriteWidth, spriteHeight);
-        fltMass = Mass;
-        fltGravityForce = fltMass * GRAVITY_ACCELERATION;
-        fltCoefficientOfFriction = CoefficientOfFriction;
-        fltFriction = Friction;
-        fltAngle = Angle;
         lastTime = System.currentTimeMillis();
         velocityY = 0;
-        velocityX = 0;
-        blnOnBoat = true;
         lstSplashedHandlers = new ArrayList<SplashedHandler>();
     }
 
@@ -112,25 +95,7 @@ public class Crate
         this.y = y;
     }
 
-
-    public float getAngle()
-    {
-        return fltAngle;
-    }
-    public void setAngle(float angle)
-    {
-        fltAngle = angle;
-    }
-
-    public float getVelocityX()
-    {
-        return velocityX;
-    }
-
-    public float getVelocityY()
-    {
-        return velocityY;
-    }
+    public float getVelocityY() { return velocityY; }
 
 
     public void draw(Canvas canvas)
@@ -138,32 +103,17 @@ public class Crate
         long currentTime = System.currentTimeMillis();
         long difference = currentTime - lastTime;
 
-        blnOnBoat = false;
-        if (blnOnBoat) {
-            float totalForce = ((long) Math.cos(fltAngle) / fltGravityForce) - fltCoefficientOfFriction;
-            float totalAcceleration = fltMass / totalForce;
-            float accelerationX = totalAcceleration * (long) Math.sin(fltAngle);
-            float accelerationY = totalAcceleration * (long) Math.cos(fltAngle);
+        velocityY += (GRAVITY_ACCELERATION * ( (double)difference / 1000 ) );
 
-            velocityX += ((accelerationY / fltMass) * difference) / 1000;
-            velocityY += ((accelerationX / fltMass) * difference) / 1000;
-        }
-        else{
-            velocityY += (GRAVITY_ACCELERATION * ( (double)difference / 1000 ) );
-
-        }
-
-//        Log.d("CRATE", Double.toString( velocityY) );
-
-        //assume boxes are 1 meter squares
+        //assume bombs are 1 meter
         y += velocityY;
 
         // where to draw the sprite
         Rect destRect = new Rect((int)x, (int)y, (int)x + spriteWidth, (int)y + spriteHeight);
+
         canvas.drawBitmap(bitmap, sourceRect, destRect, null);
 
-
-        if (y > canvas.getHeight())
+        if (y > (canvas.getHeight() - (bitmap.getHeight() * 3)))
         {
             for (SplashedHandler splashHandler:lstSplashedHandlers){
                 splashHandler.callback(this);

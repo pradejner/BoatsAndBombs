@@ -4,18 +4,14 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
+import android.graphics.Point;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.SurfaceView;
-import android.view.TextureView;
+import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.View;
+import android.view.WindowManager;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -26,9 +22,10 @@ public class GameView extends View {
 
 
     private static final float GRAVITY_ACCELERATION = 9.8f;
-    private List<Crate> crates;
+    private List<Bomb> bombs;
     private Context context;
     private GameLoopThread thdGameLoop;
+    private Bitmap bmpCrate;
 
     public GameView(Context context) {
         super(context);
@@ -51,27 +48,28 @@ public class GameView extends View {
 
     private void init()
     {
-        crates = new ArrayList<>();
+        bombs = new ArrayList<>();
 
-        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.woodencrate);
-        bitmap = Bitmap.createScaledBitmap(bitmap, 60, 60, false);
+        bmpCrate = BitmapFactory.decodeResource(context.getResources(), R.mipmap.woodencrate);
+        bmpCrate = Bitmap.createScaledBitmap(bmpCrate, 60, 60, false);
 
-        Crate crate = new Crate(bitmap, 0, 0, 5, 0, 0, 0);
-        crate.addSplashedHandler(new Crate.SplashedHandler() {
+        Bomb crate = new Bomb(bmpCrate, 0, 0);
+        crate.addSplashedHandler(new Bomb.SplashedHandler() {
             @Override
-            public void callback(Crate crate){
+            public void callback(Bomb crate){
                 CrateSplashed(crate);
             }
         });
-        crates.add(crate);
+        bombs.add(crate);
 
-        crate = new Crate(bitmap, 300, 0, 5, 0, 0, 0);
-        crate.addSplashedHandler(new Crate.SplashedHandler() {
+        crate = new Bomb(bmpCrate, 300, 0);
+        crate.addSplashedHandler(new Bomb.SplashedHandler() {
             @Override
-            public void callback(Crate crate){
+            public void callback(Bomb crate){
                 CrateSplashed(crate);
             }
-        });        crates.add(crate);
+        });
+        bombs.add(crate);
 
         thdGameLoop = new GameLoopThread(this);
         Resume();
@@ -79,10 +77,25 @@ public class GameView extends View {
     }
 
 
-    private void CrateSplashed(Crate crate)
+    private void CrateSplashed(Bomb crate)
     {
-        Log.d("CRATE", "NOW" );
-        crates.remove(crate);
+        //Log.d("CRATE", "NOW" );
+        bombs.remove(crate);
+
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        WindowManager man = (WindowManager)this.context.getSystemService(context.WINDOW_SERVICE);
+        Display display = man.getDefaultDisplay();
+         Point size = new Point();
+         display.getSize(size);
+        int MaxWidth = size.x - bmpCrate.getWidth();
+        crate = new Bomb(bmpCrate, (int)(Math.random() * MaxWidth), 0);
+        crate.addSplashedHandler(new Bomb.SplashedHandler() {
+            @Override
+            public void callback(Bomb crate){
+                CrateSplashed(crate);
+            }
+        });
+        bombs.add(crate);
     }
 
     public void Destroy()
@@ -114,7 +127,7 @@ public class GameView extends View {
         drawBackwave(canvas);
         drawBoat(canvas);
         drawFrontWave(canvas);
-        drawCrates(canvas);
+        drawBombs(canvas);
     }
 
 
@@ -136,10 +149,10 @@ public class GameView extends View {
     }
 
 
-    private void drawCrates(Canvas canvas)
+    private void drawBombs(Canvas canvas)
     {
-        for(int i = crates.size() - 1; i >= 0; i-- ) {
-            Crate item = crates.get(i);
+        for(int i = bombs.size() - 1; i >= 0; i-- ) {
+            Bomb item = bombs.get(i);
             item.draw(canvas);
         }
     }
