@@ -5,11 +5,17 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 public class WaveyBoatActivity extends AppCompatActivity {
+    private WaveView backgroundWaveView;
+    private WaveView middleWaveView;
+    private WaveView frontWaveView;
 
-    private WaveHelper mWaveHelper;
+    private WaveHelper backgroundWaveHelper;
+    private WaveHelper middleWaveHelper;
+    private WaveHelper frontWaveHelper;
+
     private GameView game;
 
-    private int mBorderColor = Color.parseColor("#44FFFFFF");
+    private int borderColor = Color.parseColor("#44FFFFFF");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,8 +26,27 @@ public class WaveyBoatActivity extends AppCompatActivity {
 
         waveView.setShapeType(WaveView.ShapeType.SQUARE);
 
-        mWaveHelper = new WaveHelper(waveView);
+        backgroundWaveView = (WaveView) findViewById(R.id.background_wave);
+        middleWaveView = (WaveView) findViewById(R.id.middle_wave);
+        frontWaveView = (WaveView) findViewById(R.id.front_wave);
 
+        setAttributesOfWave(backgroundWaveView);
+        setAttributesOfWave(middleWaveView);
+        setAttributesOfWave(frontWaveView);
+
+        backgroundWaveView.setWaveColor(Color.parseColor("#013865"), Color.parseColor("#05FF00FF"));
+        middleWaveView.setWaveColor(Color.parseColor("#026ABF"), Color.parseColor("#05FF00FF"));
+        frontWaveView.setWaveColor(Color.parseColor("#259BFC"), Color.parseColor("#05FF00FF"));
+
+        backgroundWaveView.setWaveLengthRatio(.25f);
+        middleWaveView.setWaveLengthRatio(.2f);
+        frontWaveView.setWaveLengthRatio(.15f);
+
+        frontWaveView.bringToFront();
+
+        backgroundWaveHelper = new WaveHelper(backgroundWaveView);
+        middleWaveHelper = new WaveHelper(middleWaveView);
+        frontWaveHelper = new WaveHelper(frontWaveView);
         waveView.setWaveColor(
                 Color.parseColor("#0445A3"),
                 Color.parseColor("#169DDD"));
@@ -39,12 +64,25 @@ public class WaveyBoatActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+
+        backgroundWaveHelper.cancel();
+        middleWaveHelper.cancel();
+        frontWaveHelper.cancel();
         game.Pause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        backgroundWaveHelper.start();
+        middleWaveHelper.start();
+        frontWaveHelper.start();
+    }
+
+    private void setAttributesOfWave(WaveView waveView) {
+        waveView.setBorder(0, borderColor);
+        waveView.setShapeType(WaveView.ShapeType.SQUARE);
         game.Resume();
     }
 }
