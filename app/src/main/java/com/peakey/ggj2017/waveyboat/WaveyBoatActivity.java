@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 public class WaveyBoatActivity extends AppCompatActivity {
 
     private WaveHelper mWaveHelper;
+    private GameView game;
 
     private int mBorderColor = Color.parseColor("#44FFFFFF");
 
@@ -16,6 +17,7 @@ public class WaveyBoatActivity extends AppCompatActivity {
         setContentView(R.layout.wavey_boat_activity);
         final WaveView waveView = (WaveView) findViewById(R.id.wave);
         waveView.setBorder(0, mBorderColor);
+
         waveView.setShapeType(WaveView.ShapeType.SQUARE);
 
         mWaveHelper = new WaveHelper(waveView);
@@ -23,17 +25,26 @@ public class WaveyBoatActivity extends AppCompatActivity {
         waveView.setWaveColor(
                 Color.parseColor("#0445A3"),
                 Color.parseColor("#169DDD"));
+
+         game = (GameView) findViewById(R.id.game);
+    }
+
+    @Override
+    protected  void onDestroy()
+    {
+        super.onDestroy();
+        game.Destroy();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mWaveHelper.cancel();
+        game.Pause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mWaveHelper.start();
+        game.Resume();
     }
 }
