@@ -1,19 +1,23 @@
 package com.peakey.ggj2017.waveyboat;
 
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 
-public class WaveyBoatActivity extends AppCompatActivity {
+public class WaveyBoatActivity extends AppCompatActivity implements SensorEventListener {
+    private SensorManager sensorManager = null;
+
     private WaveView backgroundWaveView;
-    private WaveView middleWaveView;
     private WaveView frontWaveView;
 
     private WaveHelper backgroundWaveHelper;
-    private WaveHelper middleWaveHelper;
     private WaveHelper frontWaveHelper;
-    
+
     private ImageView boatImage;
     private GameView game;
 
@@ -22,40 +26,33 @@ public class WaveyBoatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         setContentView(R.layout.wavey_boat_activity);
 
         backgroundWaveView = (WaveView) findViewById(R.id.background_wave);
-        middleWaveView = (WaveView) findViewById(R.id.middle_wave);
         frontWaveView = (WaveView) findViewById(R.id.front_wave);
         boatImage = (ImageView) findViewById(R.id.boat_image);
+        game = (GameView) findViewById(R.id.game);
 
-        boatImage.setImageResource(R.mipmap.boat);
+        boatImage.setImageResource(R.drawable.boat);
 
         setAttributesOfWave(backgroundWaveView);
-        setAttributesOfWave(middleWaveView);
         setAttributesOfWave(frontWaveView);
 
-        backgroundWaveView.setWaveColor(Color.parseColor("#013865"), Color.parseColor("#05FF00FF"));
-        middleWaveView.setWaveColor(Color.parseColor("#026ABF"), Color.parseColor("#05FF00FF"));
-        frontWaveView.setWaveColor(Color.parseColor("#259BFC"), Color.parseColor("#05FF00FF"));
+        backgroundWaveView.setWaveColor(Color.parseColor("#013865"), Color.parseColor("#026ABF"));
+        frontWaveView.setWaveColor(Color.parseColor("#259BFC"), Color.parseColor("#4AACFD"));
 
-        backgroundWaveView.setWaveLengthRatio(.25f);
-        middleWaveView.setWaveLengthRatio(.2f);
-        frontWaveView.setWaveLengthRatio(.15f);
-
-        middleWaveView.bringToFront();
-        frontWaveView.bringToFront();
+        backgroundWaveView.setWaveLengthRatio(.2f);
+        frontWaveView.setWaveLengthRatio(.2f);
 
         backgroundWaveHelper = new WaveHelper(backgroundWaveView);
-        middleWaveHelper = new WaveHelper(middleWaveView);
         frontWaveHelper = new WaveHelper(frontWaveView);
 
-         game = (GameView) findViewById(R.id.game);
+        frontWaveView.bringToFront();
     }
 
     @Override
-    protected  void onDestroy()
-    {
+    protected void onDestroy() {
         super.onDestroy();
         if (game != null) {
             game.Destroy();
@@ -67,7 +64,6 @@ public class WaveyBoatActivity extends AppCompatActivity {
         super.onPause();
 
         backgroundWaveHelper.cancel();
-        middleWaveHelper.cancel();
         frontWaveHelper.cancel();
         if (game != null) {
             game.Pause();
@@ -79,8 +75,16 @@ public class WaveyBoatActivity extends AppCompatActivity {
         super.onResume();
 
         backgroundWaveHelper.start();
-        middleWaveHelper.start();
         frontWaveHelper.start();
+        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), sensorManager.SENSOR_DELAY_GAME);
+        sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), sensorManager.SENSOR_DELAY_GAME);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        sensorManager.unregisterListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
+        sensorManager.unregisterListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION));
     }
 
     private void setAttributesOfWave(WaveView waveView) {
@@ -89,5 +93,25 @@ public class WaveyBoatActivity extends AppCompatActivity {
         if (game != null) {
             game.Resume();
         }
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        synchronized (this) {
+//            switch (event.sensor.getType()) {
+//                case Sensor.TYPE_ACCELEROMETER:
+//                    //boat.setRotation(boat.getRotation() + 1);
+//                    boatImage.setRotation(event.values[1] * 5);
+//                    break;
+//                case Sensor.TYPE_ORIENTATION:
+//                    break;
+//
+//            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
     }
 }
