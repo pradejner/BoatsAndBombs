@@ -1,9 +1,10 @@
 package com.peakey.ggj2017.waveyboat;
 
+import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class WaveyBoatActivity extends AppCompatActivity {
+public class WaveyBoatActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
