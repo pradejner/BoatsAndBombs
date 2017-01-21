@@ -7,10 +7,24 @@
     android:background="@mipmap/background2">
 
     <com.peakey.ggj2017.waveyboat.WaveView
-        android:id="@+id/wave"
+        android:id="@+id/background_wave"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="32dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="160dp"
+        android:layout_centerHorizontal="true"/>
+
+    <com.peakey.ggj2017.waveyboat.WaveView
+        android:id="@+id/middle_wave"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginTop="180dp"
+        android:layout_centerHorizontal="true"/>
+
+    <com.peakey.ggj2017.waveyboat.WaveView
+        android:id="@+id/front_wave"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginTop="210dp"
         android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>

@@ -28,33 +28,18 @@ import android.util.AttributeSet;
 import android.view.View;
 
 public class WaveView extends View {
-    /**
-     * +------------------------+
-     * |<--wave length->        |______
-     * |   /\          |   /\   |  |
-     * |  /  \         |  /  \  | amplitude
-     * | /    \        | /    \ |  |
-     * |/      \       |/      \|__|____
-     * |        \      /        |  |
-     * |         \    /         |  |
-     * |          \  /          |  |
-     * |           \/           | water level
-     * |                        |  |
-     * |                        |  |
-     * +------------------------+__|____
-     */
+
     private static final float DEFAULT_AMPLITUDE_RATIO = 0.05f;
     private static final float DEFAULT_WATER_LEVEL_RATIO = 0.5f;
     private static final float DEFAULT_WAVE_LENGTH_RATIO = 1.0f;
     private static final float DEFAULT_WAVE_SHIFT_RATIO = 0.0f;
 
-    public static final int DEFAULT_BEHIND_WAVE_COLOR = Color.parseColor("#28FFFFFF");
+    public static final int DEFAULT_BEHIND_WAVE_COLOR = Color.parseColor("#05FF00FF");
     public static final int DEFAULT_FRONT_WAVE_COLOR = Color.parseColor("#3CFFFFFF");
     public static final ShapeType DEFAULT_WAVE_SHAPE = ShapeType.CIRCLE;
 
     public enum ShapeType {
-        CIRCLE,
-        SQUARE
+        CIRCLE, SQUARE
     }
 
     // if true, the shader will display the wave
