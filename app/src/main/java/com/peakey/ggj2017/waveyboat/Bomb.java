@@ -7,7 +7,8 @@ import android.graphics.Rect;
 import java.util.ArrayList;
 
 /**
- * Created by peakeyAdmin on 1/20/2017.
+ * @author rhankins
+ * @ate 1/20/2017.
  */
 
 public class Bomb

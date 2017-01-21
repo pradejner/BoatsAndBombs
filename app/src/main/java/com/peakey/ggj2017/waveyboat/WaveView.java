@@ -258,7 +258,7 @@ public class WaveView extends View {
                     0,
                     mDefaultWaterLevel);
             // translate shader according to mWaveShiftRatio and mWaterLevelRatio
-            // this decides the start position(mWaveShiftRatio for x, mWaterLevelRatio for y) of waves
+            // this decides the start position(mWaveShiftRatio for newX, mWaterLevelRatio for y) of waves
             mShaderMatrix.postTranslate(
                     mWaveShiftRatio * getWidth(),
                     (DEFAULT_WATER_LEVEL_RATIO - mWaterLevelRatio) * getHeight());
