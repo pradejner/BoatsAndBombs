@@ -21,8 +21,8 @@ public class WaveyBoatActivity extends AppCompatActivity {
         mWaveHelper = new WaveHelper(waveView);
 
         waveView.setWaveColor(
-                Color.parseColor("#88b8f1ed"),
-                Color.parseColor("#b8f1ed"));
+                Color.parseColor("#0445A3"),
+                Color.parseColor("#169DDD"));
     }
 
     @Override
