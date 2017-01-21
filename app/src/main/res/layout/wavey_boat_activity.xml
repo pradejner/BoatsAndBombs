@@ -33,4 +33,12 @@
         android:layout_height="240dp"
         android:layout_marginTop="130dp"
         android:layout_centerHorizontal="true"/>
+
+    <com.peakey.ggj2017.waveyboat.GameView
+        android:id="@+id/game"
+        android:background="@android:color/transparent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="32dp"
+        android:layout_centerHorizontal="true"/>
 </RelativeLayout>

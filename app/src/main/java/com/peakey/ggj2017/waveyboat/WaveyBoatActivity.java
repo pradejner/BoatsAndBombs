@@ -13,8 +13,9 @@ public class WaveyBoatActivity extends AppCompatActivity {
     private WaveHelper backgroundWaveHelper;
     private WaveHelper middleWaveHelper;
     private WaveHelper frontWaveHelper;
-
+    
     private ImageView boatImage;
+    private GameView game;
 
     private int borderColor = Color.parseColor("#44FFFFFF");
 
@@ -48,6 +49,17 @@ public class WaveyBoatActivity extends AppCompatActivity {
         backgroundWaveHelper = new WaveHelper(backgroundWaveView);
         middleWaveHelper = new WaveHelper(middleWaveView);
         frontWaveHelper = new WaveHelper(frontWaveView);
+        
+         game = (GameView) findViewById(R.id.game);
+    }
+
+    @Override
+    protected  void onDestroy()
+    {
+        super.onDestroy();
+        if (game != null) {
+            game.Destroy();
+        }
     }
 
     @Override
@@ -57,6 +69,9 @@ public class WaveyBoatActivity extends AppCompatActivity {
         backgroundWaveHelper.cancel();
         middleWaveHelper.cancel();
         frontWaveHelper.cancel();
+        if (game != null) {
+            game.Pause();
+        }
     }
 
     @Override
@@ -71,5 +86,8 @@ public class WaveyBoatActivity extends AppCompatActivity {
     private void setAttributesOfWave(WaveView waveView) {
         waveView.setBorder(0, borderColor);
         waveView.setShapeType(WaveView.ShapeType.SQUARE);
+        if (game != null) {
+            game.Resume();
+        }
     }
 }

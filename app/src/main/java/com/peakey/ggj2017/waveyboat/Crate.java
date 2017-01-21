@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.renderscript.Double2;
+import android.util.Log;
 
 /**
  * Created by peakeyAdmin on 1/20/2017.
@@ -14,7 +16,7 @@ public class Crate
 
 
     private static final String TAG = Crate.class.getSimpleName();
-    private static final float GRAVITY = 9.8f;
+    private static final float GRAVITY_ACCELERATION = 9.8f; //M/S^2
 
     private Bitmap bitmap;		// the animation sequence
     private Rect sourceRect;	// the rectangle to be drawn from the animation bitmap
@@ -22,18 +24,21 @@ public class Crate
     private int spriteWidth;	// the width of the sprite to calculate the cut out rectangle
     private int spriteHeight;	// the height of the sprite
 
-    private int x;				// the X coordinate of the object (top left of the image)
-    private int y;				// the Y coordinate of the object (top left of the image)
+    private float x;				// the X coordinate of the object (top left of the image)
+    private float y;				// the Y coordinate of the object (top left of the image)
+
+    private float fltGravityForce;
+    private boolean blnOnBoat;
     private float fltCoefficientOfFriction;
     private float fltFriction;
     private float fltMass;
     private float fltAngle;
     private long lastTime;
-    private long velocityX;
-    private long velocityY;
+    private float velocityX;
+    private float velocityY;
 
 
-    public Crate(Bitmap bitmap, int x, int y, float Mass, float CoefficientOfFriction, float Friction, float Angle)
+    public Crate(Bitmap bitmap, float x, float y, float Mass, float CoefficientOfFriction, float Friction, float Angle)
     {
         this.bitmap = bitmap;
         this.x = x;
@@ -42,12 +47,14 @@ public class Crate
         spriteHeight = bitmap.getHeight();
         sourceRect = new Rect(0, 0, spriteWidth, spriteHeight);
         fltMass = Mass;
+        fltGravityForce = fltMass * GRAVITY_ACCELERATION;
         fltCoefficientOfFriction = CoefficientOfFriction;
         fltFriction = Friction;
         fltAngle = Angle;
         lastTime = System.currentTimeMillis();
         velocityY = 0;
         velocityX = 0;
+        blnOnBoat = true;
     }
 
     public Bitmap getBitmap() {
@@ -78,17 +85,17 @@ public class Crate
         this.spriteHeight = spriteHeight;
     }
 
-    public int getX() {
+    public float getX() {
         return x;
     }
-    public void setX(int x) {
+    public void setX(float x) {
         this.x = x;
     }
 
-    public int getY() {
+    public float getY() {
         return y;
     }
-    public void setY(int y) {
+    public void setY(float y) {
         this.y = y;
     }
 
@@ -112,35 +119,35 @@ public class Crate
         return velocityY;
     }
 
-    public void update()
-    {
-
-        // define the rectangle to cut out sprite
-        this.sourceRect.left = 1 * spriteWidth;
-        this.sourceRect.right = this.sourceRect.left + spriteWidth;
-    }
 
     public void draw(Canvas canvas)
     {
         long currentTime = System.currentTimeMillis();
         long difference = currentTime - lastTime;
 
-        float totalForce = ((long)Math.cos(fltAngle) / GRAVITY) - fltCoefficientOfFriction;
-        float forceY = totalForce * (long)Math.cos(fltAngle);
-        float forceX = totalForce * (long)Math.sin(fltAngle);
+        blnOnBoat = false;
+        if (blnOnBoat) {
+            float totalForce = ((long) Math.cos(fltAngle) / fltGravityForce) - fltCoefficientOfFriction;
+            float totalAcceleration = fltMass / totalForce;
+            float accelerationX = totalAcceleration * (long) Math.sin(fltAngle);
+            float accelerationY = totalAcceleration * (long) Math.cos(fltAngle);
 
-        velocityX += (forceX / fltMass) * difference;
-        velocityY += (forceY / fltMass) * difference;
+            velocityX += ((accelerationY / fltMass) * difference) / 1000;
+            velocityY += ((accelerationX / fltMass) * difference) / 1000;
+        }
+        else{
+            velocityY += (GRAVITY_ACCELERATION * ( (double)difference / 1000 ) );
 
+        }
 
+        //Log.d("CRATE", Double.toString( velocityY) );
+
+        //assume boxes are 1 meter squares
+        y += velocityY;
 
         // where to draw the sprite
-        Rect destRect = new Rect(getX(), getY(), getX() + spriteWidth, getY() + spriteHeight);
+        Rect destRect = new Rect((int)x, (int)y, (int)x + spriteWidth, (int)y + spriteHeight);
         canvas.drawBitmap(bitmap, sourceRect, destRect, null);
-        canvas.drawBitmap(bitmap, 20, 150, null);
-        Paint paint = new Paint();
-        paint.setARGB(50, 0, 255, 0);
-        canvas.drawRect(20 + (1 * destRect.width()), 150, 20 + (1 * destRect.width()) + destRect.width(), 150 + destRect.height(),  paint);
 
         lastTime = currentTime;
     }
