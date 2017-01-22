@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.peakey.ggj2017.waveyboat">
 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -19,5 +22,6 @@
         <activity android:name=".HighScores" android:screenOrientation="landscape"></activity>
         <activity android:name=".WaveyBoatActivity" android:screenOrientation="landscape"></activity>
         <activity android:name=".Credits" android:screenOrientation="landscape"></activity>
+        <activity android:name=".GameOver" android:screenOrientation="landscape"></activity>
     </application>
 </manifest>
