@@ -138,8 +138,12 @@ public class GameView extends SurfaceView implements SensorEventListener {
             public void run() {
                 try {
                     gameRunning = true;
+
                     while (gameRunning) {
                         Thread.sleep(100);
+                        if (!mpBackground.isPlaying()) {
+                            mpBackground.start();
+                        }
                         score += 1;
                         fltBombLikelyHood -= BOMB_INCREASE_LIKELYHOOD;
                         fltBombAcceleration += BOMB_INCREASE_ACCELERATION;
@@ -214,6 +218,8 @@ public class GameView extends SurfaceView implements SensorEventListener {
                     rctPlaneDest = new Rect(0, 0, planeWidth, planeHeight);
 
                     boatSourceRect = new Rect(0, 0, bmpBoat.getWidth(), bmpBoat.getHeight());
+
+                    resourcesReady = true;
                     return null;
                 }
             }.execute();
@@ -222,7 +228,7 @@ public class GameView extends SurfaceView implements SensorEventListener {
             Log.e("Error loadGameView: {}", e.toString());
         }
         finally {
-            resourcesReady = true;
+
         }
     }
 
