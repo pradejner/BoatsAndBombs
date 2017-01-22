@@ -38,6 +38,13 @@ import static android.content.Context.SENSOR_SERVICE;
 public class GameView extends SurfaceView implements SensorEventListener {
     SensorManager sensorManager = null;
 
+
+    private static final float PLANE_INIT_RATE = 0.5f;  // currently unchanged during game play
+    private static final float BOMB_INIT_LIKELYHOOD = 0.99f;
+    private static final float BOMB_INIT_ACCELERATION = 10f;
+    private static final float BOMB_INCREASE_LIKELYHOOD = 0.0001f;
+    private static final float BOMB_INCREASE_ACCELERATION = 0.001f;
+
     private Resources resources;
 
     private List<Bomb> bombs;
@@ -65,15 +72,16 @@ public class GameView extends SurfaceView implements SensorEventListener {
     private long deltaTime;
 
     private Boolean blnPlaneMovingRight = true;
-    private float fltPlaneRate = 0.5f;
-    private float fltBombLikelyHood = 0.99f;
-    private float fltBombAcceleration = 10f;
+    private float fltPlaneRate = PLANE_INIT_RATE;
+    private float fltBombLikelyHood = BOMB_INIT_LIKELYHOOD;
+    private float fltBombAcceleration = BOMB_INIT_ACCELERATION;
 
     private Rect rctPlaneSource;
     private Rect rctPlaneDest;
     private Rect boatSourceRect;
     private Rect boatDestRect;
 
+    private Boolean gameRunning = false;
     private int score = 0;
     private int lives = 3;
 
@@ -156,6 +164,8 @@ public class GameView extends SurfaceView implements SensorEventListener {
         rctPlaneSource = new Rect(0, 0, planeWidth, planeHeight);
         rctPlaneDest = new Rect(0, 0, planeWidth, planeHeight);
 
+        boatSourceRect = new Rect(0, 0, bmpBoat.getWidth(), bmpBoat.getHeight());
+
         thdGameDrawLoop = new GameLoopThread(this);
         resume();
         lastTime = 0;
@@ -165,11 +175,12 @@ public class GameView extends SurfaceView implements SensorEventListener {
             @Override
             public void run() {
                 try {
-                    while (true) {
+                    gameRunning = true;
+                    while (gameRunning) {
                         Thread.sleep(100);
                         score += 1;
-                        fltBombLikelyHood -= 0.0001;
-                        fltBombAcceleration += 0.001;
+                        fltBombLikelyHood -= BOMB_INCREASE_LIKELYHOOD;
+                        fltBombAcceleration += BOMB_INCREASE_ACCELERATION;
                     }
                 }
                 catch (InterruptedException ex) {
@@ -239,7 +250,6 @@ public class GameView extends SurfaceView implements SensorEventListener {
         }
     }
 
-
     private void GameOver(){
         pause();
         stop();
@@ -259,11 +269,11 @@ public class GameView extends SurfaceView implements SensorEventListener {
     }
 
     public void pause() {
-        try { thdGameLoop.join(); } catch (Exception ex) { }
+        gameRunning = false;
+        try { thdGameLoop.join(100); } catch (Exception ex) { }
         thdGameDrawLoop.setRunning(false);
         mpBackground.stop();
     }
-
 
     public void resume() {
         thdGameDrawLoop.setRunning(true);
@@ -271,7 +281,7 @@ public class GameView extends SurfaceView implements SensorEventListener {
         {
             lastTime = System.currentTimeMillis();
             thdGameLoop.start();
-            mpBackground.start();
+            //mpBackground.start();
         }
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), sensorManager.SENSOR_DELAY_UI);
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), sensorManager.SENSOR_DELAY_UI);
@@ -286,6 +296,9 @@ public class GameView extends SurfaceView implements SensorEventListener {
             this.canvas = canvas;
             canvasWidth = canvas.getWidth();
             canvasHeight = canvas.getHeight();
+
+            //must do these here AFTER we have a canvas
+            boatDestRect = new Rect(boatPositionX, canvasHeight - (int) (bmpBoat.getHeight() * 1.4), boatPositionX + bmpBoat.getWidth(), canvasHeight - (int) (bmpBoat.getHeight() * 1.4) + bmpBoat.getHeight());
         }
         if (lastTime == 0)
         {   //everything is running now, games should actually start
@@ -294,7 +307,7 @@ public class GameView extends SurfaceView implements SensorEventListener {
                 @Override
                 public void run()
                 {
-                    mpBackground.start();
+                    //mpBackground.start();
                 }
             });
             lastTime = System.currentTimeMillis();
@@ -338,8 +351,10 @@ public class GameView extends SurfaceView implements SensorEventListener {
         else if (boatPositionX + bmpBoat.getWidth() > canvasWidth) {
             boatPositionX = canvasWidth - bmpBoat.getWidth();
         }
-        boatSourceRect = new Rect(0, 0, bmpBoat.getWidth(), bmpBoat.getHeight());
-        boatDestRect = new Rect(boatPositionX, canvasHeight - (int) (bmpBoat.getHeight() * 1.4), boatPositionX + bmpBoat.getWidth(), canvasHeight - (int) (bmpBoat.getHeight() * 1.4) + bmpBoat.getHeight());
+        //boatSourceRect = new Rect(0, 0, bmpBoat.getWidth(), bmpBoat.getHeight());
+        //boatDestRect = new Rect(boatPositionX, canvasHeight - (int) (bmpBoat.getHeight() * 1.4), boatPositionX + bmpBoat.getWidth(), canvasHeight - (int) (bmpBoat.getHeight() * 1.4) + bmpBoat.getHeight());
+        boatDestRect.left = boatPositionX;
+        boatDestRect.right = boatPositionX + bmpBoat.getWidth();
 
         canvas.drawBitmap(bmpBoat, boatSourceRect, boatDestRect, null);
     }
@@ -370,7 +385,6 @@ public class GameView extends SurfaceView implements SensorEventListener {
         }
     }
 
-
     private void addBomb() {
         display.getSize(size);
         int MaxWidth = size.x - bmpBomb.getWidth();
@@ -384,13 +398,12 @@ public class GameView extends SurfaceView implements SensorEventListener {
         bombs.add(bomb);
     }
 
-
     private void drawBombs(long deltaTime) {
         int intRight = boatPositionX + bmpBoat.getWidth();
         for (int i = bombs.size() - 1; i >= 0; i--) {
             Bomb item = bombs.get(i);
             item.draw(canvas, deltaTime);
-            if (item.isHit(boatPositionX, canvasHeight - (int) (bmpBoat.getHeight() * 1.4), intRight)) {
+            if (item.isHit(boatPositionX, boatDestRect.top + (bmpBoat.getHeight() / 3), intRight)) {
                 bombHit(item);
             }
         }

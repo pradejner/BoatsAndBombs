@@ -109,7 +109,6 @@ public class Bomb
     {
         velocityY += (fltAcceleration * ( (double)deltaTime / 1000 ) );
 
-        //assume bombs are 1 meter
         y += velocityY;
 
         // where to draw the sprite
@@ -117,7 +116,7 @@ public class Bomb
 
         canvas.drawBitmap(bitmap, sourceRect, destRect, null);
 
-        if (y > (canvas.getHeight() - (bitmap.getHeight() * 3)))
+        if (y > (canvas.getHeight() - (bitmap.getHeight() * 2)))
         {
             for (SplashedHandler splashHandler:lstSplashedHandlers){
                 splashHandler.callback(this);
