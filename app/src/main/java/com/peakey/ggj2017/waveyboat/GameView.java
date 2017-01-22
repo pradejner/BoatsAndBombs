@@ -71,18 +71,21 @@ public class GameView extends SurfaceView implements SensorEventListener {
 
     public GameView(Context context) {
         super(context);
+        //setZOrderOnTop(true);
         this.context = context;
         init();
     }
 
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        //setZOrderOnTop(true);
         this.context = context;
         init();
     }
 
     public GameView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        //setZOrderOnTop(true);
         this.context = context;
         init();
     }

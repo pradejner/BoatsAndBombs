@@ -2,7 +2,9 @@ package com.peakey.ggj2017.waveyboat;
 
 import android.app.Activity;
 import android.graphics.Color;
+import android.graphics.PixelFormat;
 import android.os.Bundle;
+import android.view.SurfaceHolder;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
@@ -30,6 +32,8 @@ public class WaveyBoatActivity extends Activity {
         backgroundWaveView = (WaveView) findViewById(R.id.background_wave);
         frontWaveView = (WaveView) findViewById(R.id.front_wave);
         game = (GameView) findViewById(R.id.game);
+        SurfaceHolder sfhGame = game.getHolder();
+        sfhGame.setFormat(PixelFormat.TRANSLUCENT);
 
         bottomBar = (LinearLayout) findViewById(R.id.bottom_bar);
 
