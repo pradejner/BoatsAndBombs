@@ -281,7 +281,7 @@ public class GameView extends SurfaceView implements SensorEventListener {
         {
             lastTime = System.currentTimeMillis();
             thdGameLoop.start();
-            //mpBackground.start();
+            mpBackground.start();
         }
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), sensorManager.SENSOR_DELAY_UI);
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), sensorManager.SENSOR_DELAY_UI);
@@ -307,7 +307,7 @@ public class GameView extends SurfaceView implements SensorEventListener {
                 @Override
                 public void run()
                 {
-                    //mpBackground.start();
+                    mpBackground.start();
                 }
             });
             lastTime = System.currentTimeMillis();
