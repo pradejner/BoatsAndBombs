@@ -44,16 +44,12 @@ public class WaveyBoatActivity extends Activity {
         backgroundWaveView.setWaveLengthRatio(.25f);
         frontWaveView.setWaveLengthRatio(.15f);
 
-        frontWaveView.bringToFront();
-
-        //bottomBar.bringToFront();
-
         backgroundWaveHelper = new WaveHelper(backgroundWaveView);
         frontWaveHelper = new WaveHelper(frontWaveView);
 
-         game = (GameView) findViewById(R.id.game);
+        game = (GameView) findViewById(R.id.game);
         frontWaveView.bringToFront();
-        //bottomBar.bringToFront();
+        bottomBar.bringToFront();
     }
 
     @Override
