@@ -80,6 +80,7 @@ public class WaveyBoatActivity extends Activity {
 
         backgroundWaveHelper.start();
         frontWaveHelper.start();
+        game.resume();
     }
 
     @Override
