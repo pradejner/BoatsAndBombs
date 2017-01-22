@@ -13,6 +13,7 @@ import android.widget.TextView;
 public class GameOver extends Activity {
 
     private Button playAgain;
+    private Button mainMenu;
     private TextView highScore;
     private TextView currentScore;
     private SharedPreferences highScoreData;
@@ -28,6 +29,7 @@ public class GameOver extends Activity {
         setContentView(R.layout.game_over);
 
         playAgain = (Button) findViewById(R.id.resetButton);
+        mainMenu = (Button) findViewById(R.id.mainMenuButton);
         highScore = (TextView) findViewById(R.id.high_score);
         currentScore = (TextView) findViewById(R.id.current_score);
 
@@ -50,6 +52,14 @@ public class GameOver extends Activity {
             public void onClick(View v) {
                 Intent gameIntent = new Intent(getApplicationContext(), WaveyBoatActivity.class);
                 startActivity(gameIntent);
+            }
+        });
+
+        mainMenu.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Intent titleIntent = new Intent(getApplicationContext(), TitlePage.class);
+                startActivity(titleIntent);
             }
         });
     }

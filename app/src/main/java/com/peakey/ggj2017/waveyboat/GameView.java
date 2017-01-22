@@ -188,7 +188,8 @@ public class GameView extends SurfaceView implements SensorEventListener {
                     displayMetrics = resources.getDisplayMetrics();
 
                     bmpBackground = BitmapFactory.decodeResource(resources, R.drawable.background);
-                    bmpBoat = BitmapFactory.decodeResource(resources, R.drawable.boat_jeyan);
+                    //bmpBoat = BitmapFactory.decodeResource(resources, R.drawable.boat_jeyan);
+                    bmpBoat = BitmapFactory.decodeResource(resources, R.drawable.boat_normal);
                     bmpBomb = BitmapFactory.decodeResource(resources, R.drawable.dynamite);
                     bmpPlane = BitmapFactory.decodeResource(resources, R.drawable.plane);
 
