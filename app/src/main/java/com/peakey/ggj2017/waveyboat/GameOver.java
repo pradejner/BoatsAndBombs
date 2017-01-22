@@ -33,6 +33,7 @@ public class GameOver extends Activity {
         highScore = (TextView) findViewById(R.id.high_score);
         currentScore = (TextView) findViewById(R.id.current_score);
 
+        highScorePref = getSharedPreferences(HIGH_SCORES, 0);
         String scores = highScorePref.getString("highScores", "");
 
         highScore.setText("HighScore: " + scores);
