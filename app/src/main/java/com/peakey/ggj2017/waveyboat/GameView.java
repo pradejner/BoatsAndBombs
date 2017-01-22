@@ -141,9 +141,6 @@ public class GameView extends SurfaceView implements SensorEventListener {
 
                     while (gameRunning) {
                         Thread.sleep(100);
-                        if (!mpBackground.isPlaying()) {
-                            mpBackground.start();
-                        }
                         score += 1;
                         fltBombLikelyHood -= BOMB_INCREASE_LIKELYHOOD;
                         fltBombAcceleration += BOMB_INCREASE_ACCELERATION;
@@ -176,6 +173,7 @@ public class GameView extends SurfaceView implements SensorEventListener {
 
                     mpBackground = MediaPlayer.create(context, R.raw.background_music);
                     mpBackground.setLooping(true);
+                    mpBackground.start();
                     //try { mpBackground.prepare(); } catch (IOException ex) { }
                     highScore = context.getSharedPreferences(HIGH_SCORES, 0);
                     sensorManager = (SensorManager) context.getSystemService(SENSOR_SERVICE);
@@ -333,7 +331,7 @@ public class GameView extends SurfaceView implements SensorEventListener {
         catch (Exception ex) {
         }
         thdGameDrawLoop.setRunning(false);
-        mpBackground.stop();
+        //mpBackground.stop();
         lastTime = 0;
     }
 
@@ -361,7 +359,6 @@ public class GameView extends SurfaceView implements SensorEventListener {
             refActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mpBackground.start();
                     if (thdGameLoop.isAlive())
                     {
                         gameRunning = false;
