@@ -2,6 +2,7 @@ package com.peakey.ggj2017.waveyboat;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -12,7 +13,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.media.Image;
 import android.media.MediaPlayer;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -25,7 +25,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 
 import static android.content.Context.SENSOR_SERVICE;
 
@@ -37,6 +36,8 @@ import static android.content.Context.SENSOR_SERVICE;
 public class GameView extends SurfaceView implements SensorEventListener {
     SensorManager sensorManager = null;
 
+    private Resources resources;
+
     private List<Bomb> bombs;
     private Context context;
     private GameLoopThread thdGameLoop;
@@ -44,58 +45,76 @@ public class GameView extends SurfaceView implements SensorEventListener {
     private ImageView imgLives2;
     private ImageView imgLives1;
     private TextView txtScore;
+    private Activity refActivity;
 
     private MediaPlayer mpExplode[];
     private MediaPlayer mpSplash[];
     private int intExplode;
     private int intSplash;
     private Bitmap bmpBomb;
-    private Bitmap boat;
+    private Bitmap bmpBoat;
+    private Bitmap bmpPlane;
+    private Bitmap bmpPlaneReverse;
+
+    private long currentTime;
+    private long deltaTime;
 
     private Boolean blnPlaneMovingRight = true;
     private float fltPlaneRate = 0.5f;
-    private float fltBombLikelyHood = 0.99f;
+    private float fltBombLikelyHood = 0.90f;
     private float fltBombAcceleration = 10f;
-    private Bitmap bmpPlane;
-    private Bitmap bmpPlaneReverse;
-    Rect rctPlaneSource;
-    Rect rctPlaneDest;
 
+    private Rect rctPlaneSource;
+    private Rect rctPlaneDest;
     private Rect boatSourceRect;
     private Rect boatDestRect;
 
-    private int Score = 0;
-    private int Lives = 3;
+    private int score = 0;
+    private int lives = 3;
 
     private int boatPositionX;
+    private DisplayMetrics displayMetrics;
+    private float fltTilt = 0;
+    private long lastTime;
+
+    private WindowManager windowManager;
+    private Display display;
+    private Point size;
+
+    private Canvas canvas;
+    private int canvasWidth;
+    private int canvasHeight;
 
     public GameView(Context context) {
         super(context);
-        this.context = context;
-        init();
+        init(context);
     }
 
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.context = context;
-        init();
+        init(context);
     }
 
     public GameView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        this.context = context;
-        init();
+        init(context);
     }
 
+    private void init(Context context) {
+        this.context = context;
+        this.resources = context.getResources();
 
-    private void init() {
-        sensorManager = (SensorManager) context.getSystemService(SENSOR_SERVICE);
+        sensorManager = (SensorManager) this.context.getSystemService(SENSOR_SERVICE);
+        windowManager = (WindowManager) this.context.getSystemService(context.WINDOW_SERVICE);
+        display = windowManager.getDefaultDisplay();
+        size = new Point();
+
         mpExplode = new MediaPlayer[10];
         mpSplash = new MediaPlayer[10];
         for (int i = 0; i < mpExplode.length; i++) {
-            mpExplode[i] = MediaPlayer.create(context.getApplicationContext(), R.raw.short_explosion);
+            mpExplode[i] = MediaPlayer.create(this.context, R.raw.short_explosion);
             mpExplode[i].setVolume(1f, 1f);
-            mpSplash[i] = MediaPlayer.create(context.getApplicationContext(), R.raw.splash);
+            mpSplash[i] = MediaPlayer.create(this.context, R.raw.splash);
             mpSplash[i].setVolume(0.2f, 0.2f);
         }
         intExplode = -1;
@@ -103,45 +122,45 @@ public class GameView extends SurfaceView implements SensorEventListener {
 
         bombs = new ArrayList<>();
 
-        DisplayMetrics dp = context.getResources().getDisplayMetrics();
+        displayMetrics = resources.getDisplayMetrics();
 
-        bmpBomb = BitmapFactory.decodeResource(context.getResources(), R.drawable.dynamite);
-        bmpBomb = Bitmap.createScaledBitmap(bmpBomb, (dp.widthPixels / 35), (int)((dp.widthPixels / 35) * 2.15), false);
+        bmpBoat = BitmapFactory.decodeResource(resources, R.drawable.boat_jeyan);
+        bmpBomb = BitmapFactory.decodeResource(resources, R.drawable.dynamite);
+        bmpPlane = BitmapFactory.decodeResource(resources, R.drawable.plane);
 
-        //boat = BitmapFactory.decodeResource(context.getResources(), R.drawable.boat_normal);
-        boat = BitmapFactory.decodeResource(context.getResources(), R.drawable.boat_jeyan);
-        boat = Bitmap.createScaledBitmap(boat, (int)(dp.widthPixels / 5), (int)((dp.widthPixels / 5) * 0.82), false);
+        bmpBoat = Bitmap.createScaledBitmap(bmpBoat, (displayMetrics.widthPixels / 5), (int) ((displayMetrics.widthPixels / 5) * 0.82), false);
+        bmpBomb = Bitmap.createScaledBitmap(bmpBomb, (displayMetrics.widthPixels / 35), (int) ((displayMetrics.widthPixels / 35) * 2.15), false);
+        bmpPlane = Bitmap.createScaledBitmap(bmpPlane, (displayMetrics.widthPixels / 10), (int) ((displayMetrics.widthPixels / 10) * 1.178), false);
 
-        bmpPlane = BitmapFactory.decodeResource(context.getResources(), R.drawable.plane);
-        bmpPlane = Bitmap.createScaledBitmap(bmpPlane, (dp.widthPixels / 10), (int)((dp.widthPixels / 10) * 1.178), false);
         Matrix m = new Matrix();
         m.preScale(-1, 1);
-        bmpPlaneReverse = Bitmap.createBitmap(bmpPlane, 0, 0, bmpPlane.getWidth(), bmpPlane.getHeight(), m, false);
+
+        int planeWidth = bmpPlane.getWidth();
+        int planeHeight = bmpPlane.getHeight();
+        bmpPlaneReverse = Bitmap.createBitmap(bmpPlane, 0, 0, planeWidth, planeHeight, m, false);
         bmpPlaneReverse.setDensity(DisplayMetrics.DENSITY_DEFAULT);
 
-        rctPlaneSource = new Rect(0, 0, bmpPlane.getWidth(), bmpPlane.getHeight());
-        rctPlaneDest = new Rect(0, 0, bmpPlane.getWidth(), bmpPlane.getHeight());
+        rctPlaneSource = new Rect(0, 0, planeWidth, planeHeight);
+        rctPlaneDest = new Rect(0, 0, planeWidth, planeHeight);
 
         thdGameLoop = new GameLoopThread(this);
         resume();
         lastTime = System.currentTimeMillis();
         thdGameLoop.start();
 
-        Thread thd = new Thread(){
+        Thread thd = new Thread() {
             @Override
-            public void run()
-            {
+            public void run() {
                 try {
-                    while (true)
-                    {
+                    while (true) {
                         Thread.sleep(100);
-                        Score += 1;
+                        score += 1;
                         fltBombLikelyHood -= 0.0001;
                         fltBombAcceleration += 0.001;
+
                     }
                 }
-                catch (InterruptedException ex)
-                {
+                catch (InterruptedException ex) {
 
                 }
             }
@@ -149,46 +168,35 @@ public class GameView extends SurfaceView implements SensorEventListener {
         thd.start();
     }
 
-
-    private Activity refActivity;
-
-    public void Setup(Activity activity)
-    {
+    public void applyActivity(Activity activity) {
         refActivity = activity;
         imgLives3 = (ImageView) activity.findViewById(R.id.lives3);
         imgLives2 = (ImageView) activity.findViewById(R.id.lives2);
         imgLives1 = (ImageView) activity.findViewById(R.id.lives1);
         txtScore = (TextView) activity.findViewById(R.id.score);
-
     }
 
-    private void BombSplashed(Bomb bomb) {
-        //MediaPlayer mp = MediaPlayer.create(context.getApplicationContext(), R.raw.splash);
+    private void bombSplashed(Bomb bomb) {
         intSplash++;
-        if (intSplash >= mpSplash.length)
-        {
+        if (intSplash >= mpSplash.length) {
             intSplash = 0;
         }
         mpSplash[intSplash].start();
         bombs.remove(bomb);
-        Score += 10;
+        score += 10;
     }
 
-
-    private void BombHit(Bomb bomb) {
-
-        //MediaPlayer mp = MediaPlayer.create(context.getApplicationContext(), R.raw.short_explosion);
+    private void bombHit(Bomb bomb) {
         intExplode++;
-        if (intExplode >= mpExplode.length)
-        {
+        if (intExplode >= mpExplode.length) {
             intExplode = 0;
         }
         mpExplode[intExplode].start();
 
         bombs.remove(bomb);
 
-        Lives -= 1;
-        switch (Lives) {
+        lives -= 1;
+        switch (lives) {
             case 2:
                 refActivity.runOnUiThread(new Runnable(){
                     @Override
@@ -217,10 +225,7 @@ public class GameView extends SurfaceView implements SensorEventListener {
                 });
                 break;
         }
-
     }
-
-
 
     public void destroy() {
         boolean retry = true;
@@ -246,25 +251,26 @@ public class GameView extends SurfaceView implements SensorEventListener {
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), sensorManager.SENSOR_DELAY_UI);
     }
 
-
-    private long lastTime;
-
-
     @Override
     protected void onDraw(Canvas canvas) {
-        long currentTime = System.currentTimeMillis();
-        long deltaTime = currentTime - lastTime;
+        if (null != canvas  && this.canvas != canvas) {
+            this.canvas = canvas;
+            canvasWidth = canvas.getWidth();
+            canvasHeight = canvas.getHeight();
+        }
+        currentTime = System.currentTimeMillis();
+        deltaTime = currentTime - lastTime;
 
-        drawPlane(canvas, deltaTime);
-        drawBoat(canvas, deltaTime);
-        drawBombs(canvas, deltaTime);
+        drawPlane(deltaTime);
+        drawBoat(deltaTime);
+        drawBombs(deltaTime);
 
         if (txtScore != null) {
             refActivity.runOnUiThread(new Runnable(){
                 @Override
                 public void run()
                 {
-                    txtScore.setText("Score: " + Score);
+                    txtScore.setText("Score: " + score);
                 }
             });
         }
@@ -276,30 +282,26 @@ public class GameView extends SurfaceView implements SensorEventListener {
         sensorManager.unregisterListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION));
     }
 
-    public void drawBoat(Canvas canvas, long deltaTime) {
-        boatPositionX += fltTilt * ((float)deltaTime / 1000);
-        if (boatPositionX < 0)
-        {
+    public void drawBoat(long deltaTime) {
+        boatPositionX += fltTilt * ((float) deltaTime / 1000);
+        if (boatPositionX < 0) {
             boatPositionX = 0;
         }
-        else if (boatPositionX + boat.getWidth() > canvas.getWidth())
-        {
-            boatPositionX = canvas.getWidth() - boat.getWidth();
+        else if (boatPositionX + bmpBoat.getWidth() > canvasWidth) {
+            boatPositionX = canvasWidth - bmpBoat.getWidth();
         }
-        boatSourceRect = new Rect(0, 0, boat.getWidth(), boat.getHeight());
-        boatDestRect = new Rect(boatPositionX, canvas.getHeight() - (int)(boat.getHeight() * 1.4), boatPositionX + boat.getWidth(), canvas.getHeight() - (int)(boat.getHeight() * 1.4) + boat.getHeight());
+        boatSourceRect = new Rect(0, 0, bmpBoat.getWidth(), bmpBoat.getHeight());
+        boatDestRect = new Rect(boatPositionX, canvasHeight - (int) (bmpBoat.getHeight() * 1.4), boatPositionX + bmpBoat.getWidth(), canvasHeight - (int) (bmpBoat.getHeight() * 1.4) + bmpBoat.getHeight());
 
-        canvas.drawBitmap(boat, boatSourceRect, boatDestRect, null);
+        canvas.drawBitmap(bmpBoat, boatSourceRect, boatDestRect, null);
     }
 
-    private void drawPlane(Canvas canvas, long deltaTime) {
-        Boolean blnCanBomb = true;
+    private void drawPlane(long deltaTime) {
         if (blnPlaneMovingRight) {
             rctPlaneDest.left += fltPlaneRate * deltaTime;
             rctPlaneDest.right = rctPlaneDest.left + bmpPlane.getWidth();
-            if (rctPlaneDest.left > canvas.getWidth()) {
-                blnCanBomb = false;
-                if (rctPlaneDest.left > (canvas.getWidth() + bmpPlane.getWidth())) {
+            if (rctPlaneDest.left > canvasWidth) {
+                if (rctPlaneDest.left > (canvasWidth + bmpPlane.getWidth())) {
                     blnPlaneMovingRight = false;
                 }
             }
@@ -309,7 +311,6 @@ public class GameView extends SurfaceView implements SensorEventListener {
             rctPlaneDest.left -= fltPlaneRate * deltaTime;
             rctPlaneDest.right = rctPlaneDest.left + bmpPlane.getWidth();
             if (rctPlaneDest.left < 0) {
-                blnCanBomb = false;
                 if (rctPlaneDest.left < -bmpPlane.getWidth()) {
                     blnPlaneMovingRight = true;
                 }
@@ -323,37 +324,29 @@ public class GameView extends SurfaceView implements SensorEventListener {
 
 
     private void addBomb() {
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        WindowManager man = (WindowManager) this.context.getSystemService(context.WINDOW_SERVICE);
-        Display display = man.getDefaultDisplay();
-        Point size = new Point();
         display.getSize(size);
         int MaxWidth = size.x - bmpBomb.getWidth();
         Bomb bomb = new Bomb(bmpBomb, rctPlaneDest.left, 0, fltBombAcceleration);
         bomb.addSplashedHandler(new Bomb.SplashedHandler() {
             @Override
             public void callback(Bomb crate) {
-                BombSplashed(crate);
+                bombSplashed(crate);
             }
         });
         bombs.add(bomb);
     }
 
 
-    private void drawBombs(Canvas canvas, long deltaTime) {
-        int intRight = boatPositionX + boat.getWidth();
+    private void drawBombs(long deltaTime) {
+        int intRight = boatPositionX + bmpBoat.getWidth();
         for (int i = bombs.size() - 1; i >= 0; i--) {
             Bomb item = bombs.get(i);
             item.draw(canvas, deltaTime);
-            if (item.isHit(boatPositionX, canvas.getHeight() - (int)(boat.getHeight() * 1.4), intRight))
-            {
-                BombHit(item);
+            if (item.isHit(boatPositionX, canvasHeight - (int) (bmpBoat.getHeight() * 1.4), intRight)) {
+                bombHit(item);
             }
         }
     }
-
-
-    private float fltTilt = 0;
 
     @Override
     public void onSensorChanged(SensorEvent event) {
