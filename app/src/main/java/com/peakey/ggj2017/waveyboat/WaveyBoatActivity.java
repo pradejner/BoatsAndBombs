@@ -1,10 +1,12 @@
 package com.peakey.ggj2017.waveyboat;
 
+import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.view.Window;
+import android.view.WindowManager;
 
-public class WaveyBoatActivity extends AppCompatActivity {
+public class WaveyBoatActivity extends Activity {
     private WaveView backgroundWaveView;
     private WaveView frontWaveView;
 
@@ -18,6 +20,10 @@ public class WaveyBoatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // remove title
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.wavey_boat_activity);
 
         backgroundWaveView = (WaveView) findViewById(R.id.background_wave);
