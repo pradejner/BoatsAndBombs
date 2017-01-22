@@ -13,7 +13,6 @@ public class WaveyBoatActivity extends Activity {
     private WaveView backgroundWaveView;
     private WaveView frontWaveView;
 
-
     private WaveHelper backgroundWaveHelper;
     private WaveHelper frontWaveHelper;
     private LinearLayout bottomBar;
@@ -43,14 +42,14 @@ public class WaveyBoatActivity extends Activity {
         backgroundWaveView.setWaveColor(Color.parseColor("#013865"), Color.parseColor("#025191"));
         frontWaveView.setWaveColor(Color.parseColor("#259BFC"), Color.parseColor("#4AACFD"));
 
-        backgroundWaveView.setWaveLengthRatio(.25f);
-        frontWaveView.setWaveLengthRatio(.15f);
+        backgroundWaveView.setWaveLengthRatio(.2f);
+        frontWaveView.setWaveLengthRatio(.3f);
 
         backgroundWaveHelper = new WaveHelper(backgroundWaveView);
         frontWaveHelper = new WaveHelper(frontWaveView);
 
         game = (GameView) findViewById(R.id.game);
-        game.Setup(this);
+        game.applyActivity(this);
         frontWaveView.bringToFront();
         bottomBar.bringToFront();
     }

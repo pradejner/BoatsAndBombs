@@ -10,4 +10,5 @@
     <string name="green">Green</string>
     <string name="blue">Blue</string>
     <string name="defaultColor">Default</string>
+    <string name="default_score">Score: 0</string>
 </resources>

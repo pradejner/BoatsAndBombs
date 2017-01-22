@@ -43,24 +43,24 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
                 android:id="@+id/lives1"
-                android:layout_margin="5dp"
+                android:layout_width="@dimen/lives_width_height"
+                android:layout_height="@dimen/lives_width_height"
+                android:layout_margin="@dimen/lives_margin"
                 android:src="@drawable/heart_live"/>
 
             <ImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
                 android:id="@+id/lives2"
-                android:layout_margin="5dp"
+                android:layout_width="@dimen/lives_width_height"
+                android:layout_height="@dimen/lives_width_height"
+                android:layout_margin="@dimen/lives_margin"
                 android:src="@drawable/heart_live"/>
 
             <ImageView
-                android:layout_width="25dp"
-                android:layout_height="25dp"
                 android:id="@+id/lives3"
-                android:layout_margin="5dp"
+                android:layout_width="@dimen/lives_width_height"
+                android:layout_height="@dimen/lives_width_height"
+                android:layout_margin="@dimen/lives_margin"
                 android:src="@drawable/heart_live"/>
         </LinearLayout>
 
@@ -69,10 +69,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:layout_marginRight="10dp"
+            android:layout_marginRight="@dimen/score_margin_right"
             android:layout_weight="1"
             android:gravity="right"
-            android:text="Score: 0"
-            android:textSize="30sp"/>
+            android:text="@string/default_score"
+            android:textSize="@dimen/score_text_size"/>
     </LinearLayout>
 </RelativeLayout>
