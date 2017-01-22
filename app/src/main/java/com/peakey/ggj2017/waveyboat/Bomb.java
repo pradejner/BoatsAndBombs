@@ -22,7 +22,7 @@ public class Bomb
     private ArrayList<SplashedHandler> lstSplashedHandlers;
 
     private static final String TAG = Bomb.class.getSimpleName();
-    private static final float GRAVITY_ACCELERATION = 9.8f * 3.5f; //M/S^2
+    private float fltAcceleration;
 
     private Bitmap bitmap;		// the animation sequence
     private Rect sourceRect;	// the rectangle to be drawn from the animation bitmap
@@ -37,11 +37,12 @@ public class Bomb
     private float velocityY;
 
 
-    public Bomb(Bitmap bitmap, float x, float y )
+    public Bomb(Bitmap bitmap, float x, float y, float Acceleration )
     {
         this.bitmap = bitmap;
         this.x = x;
         this.y = y;
+        fltAcceleration = Acceleration;
         spriteWidth = bitmap.getWidth();
         spriteHeight = bitmap.getHeight();
         sourceRect = new Rect(0, 0, spriteWidth, spriteHeight);
@@ -106,7 +107,7 @@ public class Bomb
 
     public void draw(Canvas canvas, long deltaTime)
     {
-        velocityY += (GRAVITY_ACCELERATION * ( (double)deltaTime / 1000 ) );
+        velocityY += (fltAcceleration * ( (double)deltaTime / 1000 ) );
 
         //assume bombs are 1 meter
         y += velocityY;

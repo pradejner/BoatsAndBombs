@@ -17,18 +17,24 @@ public class GameLoopThread extends Thread {
 
     @Override
     public void run() {
-        Handler mainHandler = new Handler(view.getContext().getMainLooper());
+
         while (running) {
             try {
-
-                Runnable myRunnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        view.invalidate();
+                Canvas c = null;
+                try {
+                    c = view.getHolder().lockCanvas();
+                    if (c == null)
+                    {
+                        continue;
                     }
-                };
-                mainHandler.post(myRunnable);
-
+                    synchronized (view.getHolder()) {
+                        view.draw(c);
+                    }
+                } finally {
+                    if (c != null) {
+                        view.getHolder().unlockCanvasAndPost(c);
+                    }
+                }
             }
             finally
             {

@@ -17,6 +17,7 @@ import android.media.MediaPlayer;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -33,7 +34,7 @@ import static android.content.Context.SENSOR_SERVICE;
  * @date 1/21/2017.
  */
 
-public class GameView extends View implements SensorEventListener {
+public class GameView extends SurfaceView implements SensorEventListener {
     SensorManager sensorManager = null;
 
     private List<Bomb> bombs;
@@ -53,7 +54,8 @@ public class GameView extends View implements SensorEventListener {
 
     private Boolean blnPlaneMovingRight = true;
     private float fltPlaneRate = 0.5f;
-    private float fltBombLikelyHood = 0.90f;
+    private float fltBombLikelyHood = 0.99f;
+    private float fltBombAcceleration = 10f;
     private Bitmap bmpPlane;
     private Bitmap bmpPlaneReverse;
     Rect rctPlaneSource;
@@ -134,6 +136,8 @@ public class GameView extends View implements SensorEventListener {
                     {
                         Thread.sleep(100);
                         Score += 1;
+                        fltBombLikelyHood -= 0.0001;
+                        fltBombAcceleration += 0.001;
                     }
                 }
                 catch (InterruptedException ex)
@@ -146,8 +150,11 @@ public class GameView extends View implements SensorEventListener {
     }
 
 
+    private Activity refActivity;
+
     public void Setup(Activity activity)
     {
+        refActivity = activity;
         imgLives3 = (ImageView) activity.findViewById(R.id.lives3);
         imgLives2 = (ImageView) activity.findViewById(R.id.lives2);
         imgLives1 = (ImageView) activity.findViewById(R.id.lives1);
@@ -183,13 +190,31 @@ public class GameView extends View implements SensorEventListener {
         Lives -= 1;
         switch (Lives) {
             case 2:
-                imgLives3.setImageResource(R.drawable.heart_dead);
+                refActivity.runOnUiThread(new Runnable(){
+                    @Override
+                    public void run()
+                    {
+                        imgLives3.setImageResource(R.drawable.heart_dead);
+                    }
+                });
                 break;
             case 1:
-                imgLives2.setImageResource(R.drawable.heart_dead);
+                refActivity.runOnUiThread(new Runnable(){
+                    @Override
+                    public void run()
+                    {
+                        imgLives2.setImageResource(R.drawable.heart_dead);
+                    }
+                });
                 break;
             default:
-                imgLives1.setImageResource(R.drawable.heart_dead);
+                refActivity.runOnUiThread(new Runnable(){
+                    @Override
+                    public void run()
+                    {
+                        imgLives1.setImageResource(R.drawable.heart_dead);
+                    }
+                });
                 break;
         }
 
@@ -235,7 +260,13 @@ public class GameView extends View implements SensorEventListener {
         drawBombs(canvas, deltaTime);
 
         if (txtScore != null) {
-            txtScore.setText("Score: " + Score);
+            refActivity.runOnUiThread(new Runnable(){
+                @Override
+                public void run()
+                {
+                    txtScore.setText("Score: " + Score);
+                }
+            });
         }
         lastTime = currentTime;
     }
@@ -298,7 +329,7 @@ public class GameView extends View implements SensorEventListener {
         Point size = new Point();
         display.getSize(size);
         int MaxWidth = size.x - bmpBomb.getWidth();
-        Bomb bomb = new Bomb(bmpBomb, rctPlaneDest.left, 0);
+        Bomb bomb = new Bomb(bmpBomb, rctPlaneDest.left, 0, fltBombAcceleration);
         bomb.addSplashedHandler(new Bomb.SplashedHandler() {
             @Override
             public void callback(Bomb crate) {
