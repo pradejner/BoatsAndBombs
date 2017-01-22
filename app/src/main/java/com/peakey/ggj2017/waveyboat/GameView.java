@@ -277,6 +277,7 @@ public class GameView extends SurfaceView implements SensorEventListener {
                         String scores = highScore.getString("highScores", "");
                         if (scores.length() > 0) {
                             if (score > Integer.parseInt(scores)) {
+                                scoreEdit.remove("highScores");
                                 scoreEdit.putString("highScores", scores + "" + score);
                                 scoreEdit.commit();
                             }
@@ -285,10 +286,13 @@ public class GameView extends SurfaceView implements SensorEventListener {
                             scoreEdit.putString("highScores", scores + "" + score);
                             scoreEdit.commit();
                         }
+
+                        Intent gameIntent = new Intent(getContext(), GameOver.class);
+                        gameIntent.putExtra("score", Integer.toString(score));
+                        getContext().startActivity(gameIntent);
                     }
                 });
-                Intent gameIntent = new Intent(this.getContext(), GameOver.class);
-                this.getContext().startActivity(gameIntent);
+
                 break;
         }
     }

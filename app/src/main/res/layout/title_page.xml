@@ -26,7 +26,7 @@
         android:id="@+id/scores_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="HighScores"
+        android:text="HighScore"
         android:textSize="30sp"
         android:layout_gravity="center"/>
     <Button

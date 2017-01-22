@@ -16,7 +16,7 @@ public class GameOver extends Activity {
     private Button mainMenu;
     private TextView highScore;
     private TextView currentScore;
-    private SharedPreferences highScoreData;
+    private static SharedPreferences highScorePref;
     public static final String HIGH_SCORES = "HighScores";
 
     @Override
@@ -32,6 +32,12 @@ public class GameOver extends Activity {
         mainMenu = (Button) findViewById(R.id.mainMenuButton);
         highScore = (TextView) findViewById(R.id.high_score);
         currentScore = (TextView) findViewById(R.id.current_score);
+
+        String scores = highScorePref.getString("highScores", "");
+
+        highScore.setText("HighScore: " + scores);
+        Intent intent = getIntent();
+        currentScore.setText("Current Score: " + intent.getStringExtra("score"));
 
 //        highScore = getSharedPreferences(HIGH_SCORES, 0);//gethighscores
 //        //initialize components
@@ -63,5 +69,4 @@ public class GameOver extends Activity {
             }
         });
     }
-
 }
