@@ -28,7 +28,7 @@ public class GameLoopThread extends Thread {
                         continue;
                     }
                     synchronized (view.getHolder()) {
-                        view.draw(c);
+                        view.Draw(c);
                     }
                 } finally {
                     if (c != null) {

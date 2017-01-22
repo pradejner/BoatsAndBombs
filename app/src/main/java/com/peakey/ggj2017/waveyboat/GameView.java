@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -51,6 +52,7 @@ public class GameView extends SurfaceView implements SensorEventListener {
     private MediaPlayer mpSplash[];
     private int intExplode;
     private int intSplash;
+    private Bitmap bmpBackground;
     private Bitmap bmpBomb;
     private Bitmap bmpBoat;
     private Bitmap bmpPlane;
@@ -61,7 +63,7 @@ public class GameView extends SurfaceView implements SensorEventListener {
 
     private Boolean blnPlaneMovingRight = true;
     private float fltPlaneRate = 0.5f;
-    private float fltBombLikelyHood = 0.90f;
+    private float fltBombLikelyHood = 0.99f;
     private float fltBombAcceleration = 10f;
 
     private Rect rctPlaneSource;
@@ -100,7 +102,8 @@ public class GameView extends SurfaceView implements SensorEventListener {
         init(context);
     }
 
-    private void init(Context context) {
+    private void init(Context context)
+    {
         this.context = context;
         this.resources = context.getResources();
 
@@ -124,10 +127,12 @@ public class GameView extends SurfaceView implements SensorEventListener {
 
         displayMetrics = resources.getDisplayMetrics();
 
+        bmpBackground = BitmapFactory.decodeResource(resources, R.drawable.background);
         bmpBoat = BitmapFactory.decodeResource(resources, R.drawable.boat_jeyan);
         bmpBomb = BitmapFactory.decodeResource(resources, R.drawable.dynamite);
         bmpPlane = BitmapFactory.decodeResource(resources, R.drawable.plane);
 
+        bmpBackground = Bitmap.createScaledBitmap(bmpBackground, displayMetrics.widthPixels, displayMetrics.heightPixels, false);
         bmpBoat = Bitmap.createScaledBitmap(bmpBoat, (displayMetrics.widthPixels / 5), (int) ((displayMetrics.widthPixels / 5) * 0.82), false);
         bmpBomb = Bitmap.createScaledBitmap(bmpBomb, (displayMetrics.widthPixels / 35), (int) ((displayMetrics.widthPixels / 35) * 2.15), false);
         bmpPlane = Bitmap.createScaledBitmap(bmpPlane, (displayMetrics.widthPixels / 10), (int) ((displayMetrics.widthPixels / 10) * 1.178), false);
@@ -221,10 +226,17 @@ public class GameView extends SurfaceView implements SensorEventListener {
                     public void run()
                     {
                         imgLives1.setImageResource(R.drawable.heart_dead);
+                        GameOver();
                     }
                 });
                 break;
         }
+    }
+
+
+    private void GameOver(){
+        pause();
+        stop();
     }
 
     public void destroy() {
@@ -253,7 +265,10 @@ public class GameView extends SurfaceView implements SensorEventListener {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (null != canvas  && this.canvas != canvas) {
+    }
+
+    public void Draw(Canvas canvas){
+        if (null != canvas ) { // && this.canvas != canvas) {
             this.canvas = canvas;
             canvasWidth = canvas.getWidth();
             canvasHeight = canvas.getHeight();
@@ -261,6 +276,7 @@ public class GameView extends SurfaceView implements SensorEventListener {
         currentTime = System.currentTimeMillis();
         deltaTime = currentTime - lastTime;
 
+        drawBackground();
         drawPlane(deltaTime);
         drawBoat(deltaTime);
         drawBombs(deltaTime);
@@ -278,8 +294,14 @@ public class GameView extends SurfaceView implements SensorEventListener {
     }
 
     public void stop() {
+        pause();
         sensorManager.unregisterListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
         sensorManager.unregisterListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION));
+    }
+
+    public void drawBackground() {
+        Rect bgSourceRect = new Rect(0, 0, bmpBackground.getWidth(), bmpBackground.getHeight());
+        canvas.drawBitmap(bmpBackground, bgSourceRect, bgSourceRect, null);
     }
 
     public void drawBoat(long deltaTime) {
