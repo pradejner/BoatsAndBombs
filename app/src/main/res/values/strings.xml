@@ -19,4 +19,5 @@
     <string name="high_score_text_end_game">High Score:</string>
     <string name="main_menu_button_text">Main Menu</string>
     <string name="play_again_button_text">Play Again</string>
+    <string name="game_over_text">Game Over</string>
 </resources>
