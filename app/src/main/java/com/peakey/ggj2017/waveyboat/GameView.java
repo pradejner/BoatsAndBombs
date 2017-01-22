@@ -161,6 +161,10 @@ public class GameView extends SurfaceView implements SensorEventListener {
 
                 @Override
                 protected Void doInBackground(Void... params) {
+                    if (resourcesReady)
+                    {
+                        return null;
+                    }
                     sensorManager = (SensorManager) context.getSystemService(SENSOR_SERVICE);
                     windowManager = (WindowManager) context.getSystemService(context.WINDOW_SERVICE);
                     display = windowManager.getDefaultDisplay();
