@@ -15,6 +15,7 @@ public class TitlePage extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        GameView.loadGameView(getApplicationContext());
         setContentView(R.layout.title_page);
         game = (Button) findViewById(R.id.start_button);
         //game button listener onclick creates intent and goes to game activity
