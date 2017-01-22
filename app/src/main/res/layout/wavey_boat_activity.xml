@@ -20,13 +20,6 @@
         android:layout_marginTop="190dp"
         android:layout_centerHorizontal="true"/>
 
-    <ImageView
-        android:id="@+id/boat_image"
-        android:layout_width="240dp"
-        android:layout_height="240dp"
-        android:layout_marginTop="130dp"
-        android:layout_centerHorizontal="true"/>
-
     <com.peakey.ggj2017.waveyboat.GameView
         android:id="@+id/game"
         android:background="@android:color/transparent"
@@ -34,4 +27,52 @@
         android:layout_height="match_parent"
         android:layout_marginTop="32dp"
         android:layout_centerHorizontal="true"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/transparent"
+        android:orientation="horizontal"
+        android:weightSum="5">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/heart_live"
+                android:layout_margin="5dp"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/heart_live"
+                android:layout_margin="5dp"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/heart_dead"
+                android:layout_margin="5dp"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:textSize="30sp"
+            android:text="Score: 0"
+            android:layout_weight="1"
+            android:layout_gravity="bottom"
+            android:layout_marginRight="10dp"/>
+    </LinearLayout>
 </RelativeLayout>

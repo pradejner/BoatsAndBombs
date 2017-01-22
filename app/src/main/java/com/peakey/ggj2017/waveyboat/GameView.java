@@ -11,6 +11,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaPlayer;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -96,7 +97,8 @@ public class GameView extends View implements SensorEventListener {
 
 
     private void BombSplashed(Bomb bomb) {
-        //Log.d("CRATE", "NOW" );
+        MediaPlayer mp = MediaPlayer.create(context.getApplicationContext(), R.raw.short_explosion);
+        mp.start();
         bombs.remove(bomb);
     }
 
