@@ -278,12 +278,12 @@ public class GameView extends SurfaceView implements SensorEventListener {
                         if (scores.length() > 0) {
                             if (score > Integer.parseInt(scores)) {
                                 scoreEdit.remove("highScores");
-                                scoreEdit.putString("highScores", scores + "" + score);
+                                scoreEdit.putString("highScores", "" + score);
                                 scoreEdit.commit();
                             }
                         }
                         else {
-                            scoreEdit.putString("highScores", scores + "" + score);
+                            scoreEdit.putString("highScores", "" + score);
                             scoreEdit.commit();
                         }
 
@@ -324,15 +324,11 @@ public class GameView extends SurfaceView implements SensorEventListener {
         }
         thdGameDrawLoop.setRunning(false);
         mpBackground.stop();
+        lastTime = 0;
     }
 
     public void resume() {
         thdGameDrawLoop.setRunning(true);
-        if (this.canvas != null) {
-            lastTime = System.currentTimeMillis();
-            thdGameLoop.start();
-            mpBackground.start();
-        }
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), sensorManager.SENSOR_DELAY_UI);
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), sensorManager.SENSOR_DELAY_UI);
     }
@@ -351,11 +347,25 @@ public class GameView extends SurfaceView implements SensorEventListener {
             boatDestRect = new Rect(boatPositionX, canvasHeight - (int) (bmpBoat.getHeight() * 1.4), boatPositionX + bmpBoat.getWidth(), canvasHeight - (int) (bmpBoat.getHeight() * 1.4) + bmpBoat.getHeight());
         }
         if (lastTime == 0) {   //everything is running now, games should actually start
-            thdGameLoop.start();
+
             refActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     mpBackground.start();
+                    if (thdGameLoop.isAlive())
+                    {
+                        gameRunning = false;
+                        try {
+                            thdGameLoop.join(100);
+                        } catch (InterruptedException ex) {
+
+                        }
+                    }
+                    try {
+                        thdGameLoop.start();
+                    } catch (Exception ex) {
+
+                    }
                 }
             });
             lastTime = System.currentTimeMillis();

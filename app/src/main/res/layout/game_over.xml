@@ -19,6 +19,7 @@
         android:layout_width="162dp"
         android:layout_height="wrap_content"
         android:text="Play Again"
+        android:visibility="gone"
         android:layout_gravity="center_vertical|center_horizontal"/>
 
     <Button
@@ -34,6 +35,7 @@
         android:layout_height="wrap_content"
         android:text="High Score"
         android:textSize="30sp"
+        android:textColor="#996600"
         android:layout_gravity="center_vertical|center_horizontal"/>
 
     <TextView
@@ -42,6 +44,7 @@
         android:layout_height="wrap_content"
         android:text="Current Score"
         android:textSize="30sp"
+        android:textColor="#996600"
         android:layout_gravity="center_vertical|center_horizontal"/>
 
 </LinearLayout>
