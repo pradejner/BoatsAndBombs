@@ -75,12 +75,17 @@ public class GameView extends View implements SensorEventListener {
 
         bombs = new ArrayList<>();
 
-        bmpBomb = BitmapFactory.decodeResource(context.getResources(), R.mipmap.dynamite);
-        bmpBomb = Bitmap.createScaledBitmap(bmpBomb, 60, 60, false);
-        boat = BitmapFactory.decodeResource(context.getResources(), R.drawable.boat);
+        DisplayMetrics dp = context.getResources().getDisplayMetrics();
 
-        bmpPlane = BitmapFactory.decodeResource(context.getResources(), R.mipmap.plane);
-        bmpPlane = Bitmap.createScaledBitmap(bmpPlane, 100, 100, false);
+        bmpBomb = BitmapFactory.decodeResource(context.getResources(), R.drawable.dynamite);
+        bmpBomb = Bitmap.createScaledBitmap(bmpBomb, (dp.widthPixels / 35), (int)((dp.widthPixels / 35) * 2.15), false);
+
+        //boat = BitmapFactory.decodeResource(context.getResources(), R.drawable.boat_normal);
+        boat = BitmapFactory.decodeResource(context.getResources(), R.drawable.boat_jeyan);
+        boat = Bitmap.createScaledBitmap(boat, (int)(dp.widthPixels / 5), (int)((dp.widthPixels / 5) * 0.82), false);
+
+        bmpPlane = BitmapFactory.decodeResource(context.getResources(), R.drawable.plane);
+        bmpPlane = Bitmap.createScaledBitmap(bmpPlane, (dp.widthPixels / 10), (int)((dp.widthPixels / 10) * 1.178), false);
         Matrix m = new Matrix();
         m.preScale(-1, 1);
         bmpPlaneReverse = Bitmap.createBitmap(bmpPlane, 0, 0, bmpPlane.getWidth(), bmpPlane.getHeight(), m, false);
@@ -97,10 +102,20 @@ public class GameView extends View implements SensorEventListener {
 
 
     private void BombSplashed(Bomb bomb) {
-        MediaPlayer mp = MediaPlayer.create(context.getApplicationContext(), R.raw.short_explosion);
+        MediaPlayer mp = MediaPlayer.create(context.getApplicationContext(), R.raw.splash);
+        mp.setVolume(0.5f, 0.5f);
         mp.start();
         bombs.remove(bomb);
     }
+
+
+    private void BombHit(Bomb bomb) {
+        MediaPlayer mp = MediaPlayer.create(context.getApplicationContext(), R.raw.short_explosion);
+        mp.setVolume(0.5f, 0.5f);
+        mp.start();
+        bombs.remove(bomb);
+    }
+
 
     public void destroy() {
         boolean retry = true;
@@ -158,7 +173,7 @@ public class GameView extends View implements SensorEventListener {
             boatPositionX = canvas.getWidth() - boat.getWidth();
         }
         boatSourceRect = new Rect(0, 0, boat.getWidth(), boat.getHeight());
-        boatDestRect = new Rect(boatPositionX, 500, boatPositionX + boat.getWidth(), 500 + boat.getHeight());
+        boatDestRect = new Rect(boatPositionX, canvas.getHeight() - (int)(boat.getHeight() * 1.4), boatPositionX + boat.getWidth(), canvas.getHeight() - (int)(boat.getHeight() * 1.4) + boat.getHeight());
 
         canvas.drawBitmap(boat, boatSourceRect, boatDestRect, null);
     }
@@ -212,9 +227,14 @@ public class GameView extends View implements SensorEventListener {
 
 
     private void drawBombs(Canvas canvas, long deltaTime) {
+        int intRight = boatPositionX + boat.getWidth();
         for (int i = bombs.size() - 1; i >= 0; i--) {
             Bomb item = bombs.get(i);
             item.draw(canvas, deltaTime);
+            if (item.isHit(boatPositionX, canvas.getHeight() - (int)(boat.getHeight() * 1.4), intRight))
+            {
+                BombHit(item);
+            }
         }
     }
 

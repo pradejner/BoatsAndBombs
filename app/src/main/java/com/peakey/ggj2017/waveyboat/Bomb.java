@@ -99,6 +99,11 @@ public class Bomb
     public float getVelocityY() { return velocityY; }
 
 
+    public Boolean isHit(int intLeft, int intTop, int intRight)
+    {
+        return !((intTop > (y + bitmap.getHeight())) || (x < intLeft) || (x > intRight) );
+    }
+
     public void draw(Canvas canvas, long deltaTime)
     {
         velocityY += (GRAVITY_ACCELERATION * ( (double)deltaTime / 1000 ) );

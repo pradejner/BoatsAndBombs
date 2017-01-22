@@ -11,7 +11,6 @@ public class WaveyBoatActivity extends Activity {
     private WaveView backgroundWaveView;
     private WaveView frontWaveView;
 
-    private LinearLayout bottomBar;
 
     private WaveHelper backgroundWaveHelper;
     private WaveHelper frontWaveHelper;
@@ -47,14 +46,14 @@ public class WaveyBoatActivity extends Activity {
 
         frontWaveView.bringToFront();
 
-        bottomBar.bringToFront();
+        //bottomBar.bringToFront();
 
         backgroundWaveHelper = new WaveHelper(backgroundWaveView);
         frontWaveHelper = new WaveHelper(frontWaveView);
 
          game = (GameView) findViewById(R.id.game);
         frontWaveView.bringToFront();
-        bottomBar.bringToFront();
+        //bottomBar.bringToFront();
     }
 
     @Override
