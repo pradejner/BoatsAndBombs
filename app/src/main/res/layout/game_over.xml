@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/game_over_background">
+
+    <TextView
+        android:id="@+id/game_over"
+        android:layout_width="match_parent"
+        android:layout_height="181dp"
+        android:text="Game Over"
+        android:textIsSelectable="false"
+        android:textSize="70sp"
+        android:textColor="#996600"
+        android:gravity="center_vertical|center_horizontal" />
+
+    <Button
+        android:id="@+id/resetButton"
+        android:layout_width="162dp"
+        android:layout_height="wrap_content"
+        android:text="Play Again"
+        android:layout_gravity="center_vertical|center_horizontal"/>
+
+    <TextView
+        android:id="@+id/high_score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="High Score"
+        android:textSize="30sp"
+        android:layout_gravity="center_vertical|center_horizontal"/>
+
+    <TextView
+        android:id="@+id/current_score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Current Score"
+        android:textSize="30sp"
+        android:layout_gravity="center_vertical|center_horizontal"/>
+
+</LinearLayout>
