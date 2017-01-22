@@ -22,7 +22,7 @@ public class Bomb
     private ArrayList<SplashedHandler> lstSplashedHandlers;
 
     private static final String TAG = Bomb.class.getSimpleName();
-    private static final float GRAVITY_ACCELERATION = 9.8f; //M/S^2
+    private static final float GRAVITY_ACCELERATION = 9.8f * 3.5f; //M/S^2
 
     private Bitmap bitmap;		// the animation sequence
     private Rect sourceRect;	// the rectangle to be drawn from the animation bitmap
@@ -101,7 +101,7 @@ public class Bomb
 
     public Boolean isHit(int intLeft, int intTop, int intRight)
     {
-        return !((intTop > (y + bitmap.getHeight())) || (x < intLeft) || (x > intRight) );
+        return !((intTop > (y + bitmap.getHeight())) || ((x + bitmap.getWidth()) < intLeft) || (x > intRight) );
     }
 
     public void draw(Canvas canvas, long deltaTime)

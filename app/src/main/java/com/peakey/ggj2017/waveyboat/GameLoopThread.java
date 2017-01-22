@@ -19,7 +19,6 @@ public class GameLoopThread extends Thread {
     public void run() {
         Handler mainHandler = new Handler(view.getContext().getMainLooper());
         while (running) {
-            Canvas c = null;
             try {
 
                 Runnable myRunnable = new Runnable() {
@@ -30,22 +29,10 @@ public class GameLoopThread extends Thread {
                 };
                 mainHandler.post(myRunnable);
 
-//                c = view.getHolder().lockCanvas();
-//                if (c == null)
-//                {
-//                    Thread.sleep(50);
-//                    continue;
-//                }
-//                synchronized (view.getHolder()) {
-//                    view.onDraw(c);
-//                }
-//            } catch (InterruptedException ex) {
             }
             finally
             {
-//                if (c != null) {
-//                    view.getHolder().unlockCanvasAndPost(c);
-//                }
+
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.peakey.ggj2017.waveyboat;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,15 +12,19 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.Image;
 import android.media.MediaPlayer;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 import static android.content.Context.SENSOR_SERVICE;
 
@@ -34,13 +39,21 @@ public class GameView extends View implements SensorEventListener {
     private List<Bomb> bombs;
     private Context context;
     private GameLoopThread thdGameLoop;
+    private ImageView imgLives3;
+    private ImageView imgLives2;
+    private ImageView imgLives1;
+    private TextView txtScore;
 
+    private MediaPlayer mpExplode[];
+    private MediaPlayer mpSplash[];
+    private int intExplode;
+    private int intSplash;
     private Bitmap bmpBomb;
     private Bitmap boat;
 
     private Boolean blnPlaneMovingRight = true;
     private float fltPlaneRate = 0.5f;
-    private float fltBombLikelyHood = 0.99f;
+    private float fltBombLikelyHood = 0.90f;
     private Bitmap bmpPlane;
     private Bitmap bmpPlaneReverse;
     Rect rctPlaneSource;
@@ -48,6 +61,9 @@ public class GameView extends View implements SensorEventListener {
 
     private Rect boatSourceRect;
     private Rect boatDestRect;
+
+    private int Score = 0;
+    private int Lives = 3;
 
     private int boatPositionX;
 
@@ -72,6 +88,16 @@ public class GameView extends View implements SensorEventListener {
 
     private void init() {
         sensorManager = (SensorManager) context.getSystemService(SENSOR_SERVICE);
+        mpExplode = new MediaPlayer[10];
+        mpSplash = new MediaPlayer[10];
+        for (int i = 0; i < mpExplode.length; i++) {
+            mpExplode[i] = MediaPlayer.create(context.getApplicationContext(), R.raw.short_explosion);
+            mpExplode[i].setVolume(1f, 1f);
+            mpSplash[i] = MediaPlayer.create(context.getApplicationContext(), R.raw.splash);
+            mpSplash[i].setVolume(0.2f, 0.2f);
+        }
+        intExplode = -1;
+        intSplash = -1;
 
         bombs = new ArrayList<>();
 
@@ -98,23 +124,77 @@ public class GameView extends View implements SensorEventListener {
         resume();
         lastTime = System.currentTimeMillis();
         thdGameLoop.start();
+
+        Thread thd = new Thread(){
+            @Override
+            public void run()
+            {
+                try {
+                    while (true)
+                    {
+                        Thread.sleep(100);
+                        Score += 1;
+                    }
+                }
+                catch (InterruptedException ex)
+                {
+
+                }
+            }
+        };
+        thd.start();
     }
 
 
+    public void Setup(Activity activity)
+    {
+        imgLives3 = (ImageView) activity.findViewById(R.id.lives3);
+        imgLives2 = (ImageView) activity.findViewById(R.id.lives2);
+        imgLives1 = (ImageView) activity.findViewById(R.id.lives1);
+        txtScore = (TextView) activity.findViewById(R.id.score);
+
+    }
+
     private void BombSplashed(Bomb bomb) {
-        MediaPlayer mp = MediaPlayer.create(context.getApplicationContext(), R.raw.splash);
-        mp.setVolume(0.5f, 0.5f);
-        mp.start();
+        //MediaPlayer mp = MediaPlayer.create(context.getApplicationContext(), R.raw.splash);
+        intSplash++;
+        if (intSplash >= mpSplash.length)
+        {
+            intSplash = 0;
+        }
+        mpSplash[intSplash].start();
         bombs.remove(bomb);
+        Score += 10;
     }
 
 
     private void BombHit(Bomb bomb) {
-        MediaPlayer mp = MediaPlayer.create(context.getApplicationContext(), R.raw.short_explosion);
-        mp.setVolume(0.5f, 0.5f);
-        mp.start();
+
+        //MediaPlayer mp = MediaPlayer.create(context.getApplicationContext(), R.raw.short_explosion);
+        intExplode++;
+        if (intExplode >= mpExplode.length)
+        {
+            intExplode = 0;
+        }
+        mpExplode[intExplode].start();
+
         bombs.remove(bomb);
+
+        Lives -= 1;
+        switch (Lives) {
+            case 2:
+                imgLives3.setImageResource(R.drawable.heart_dead);
+                break;
+            case 1:
+                imgLives2.setImageResource(R.drawable.heart_dead);
+                break;
+            default:
+                imgLives1.setImageResource(R.drawable.heart_dead);
+                break;
+        }
+
     }
+
 
 
     public void destroy() {
@@ -154,6 +234,9 @@ public class GameView extends View implements SensorEventListener {
         drawBoat(canvas, deltaTime);
         drawBombs(canvas, deltaTime);
 
+        if (txtScore != null) {
+            txtScore.setText("Score: " + Score);
+        }
         lastTime = currentTime;
     }
 

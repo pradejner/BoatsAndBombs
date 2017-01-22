@@ -48,6 +48,7 @@ public class WaveyBoatActivity extends Activity {
         frontWaveHelper = new WaveHelper(frontWaveView);
 
         game = (GameView) findViewById(R.id.game);
+        game.Setup(this);
         frontWaveView.bringToFront();
         bottomBar.bringToFront();
     }
