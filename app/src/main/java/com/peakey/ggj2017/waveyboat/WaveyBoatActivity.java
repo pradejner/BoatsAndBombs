@@ -18,8 +18,6 @@ public class WaveyBoatActivity extends Activity {
 
     private GameView game;
 
-    private int borderColor = Color.parseColor("#44FFFFFF");
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,8 +36,8 @@ public class WaveyBoatActivity extends Activity {
         setAttributesOfWave(backgroundWaveView);
         setAttributesOfWave(frontWaveView);
 
-        backgroundWaveView.setWaveColor(Color.parseColor("#013865"), Color.parseColor("#05FF00FF"));
-        frontWaveView.setWaveColor(Color.parseColor("#259BFC"), Color.parseColor("#05FF00FF"));
+        backgroundWaveView.setWaveColor(Color.parseColor("#013865"), Color.parseColor("#025191"));
+        frontWaveView.setWaveColor(Color.parseColor("#259BFC"), Color.parseColor("#4AACFD"));
 
         backgroundWaveView.setWaveLengthRatio(.25f);
         frontWaveView.setWaveLengthRatio(.15f);
@@ -90,7 +88,6 @@ public class WaveyBoatActivity extends Activity {
     }
 
     private void setAttributesOfWave(WaveView waveView) {
-        waveView.setBorder(0, borderColor);
         waveView.setShapeType(WaveView.ShapeType.SQUARE);
         if (game != null) {
             game.resume();
