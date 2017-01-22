@@ -1,30 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical"
     android:weightSum="1">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="181dp"
-        android:text="High Score!"
+        android:text="@string/high_scores"
         android:id="@+id/hsTextView"
         android:textIsSelectable="false"
-        android:textSize="70sp"
+        android:textSize="@dimen/highscores_text_size_2"
         android:gravity="center_horizontal" />
 
     <TextView
-        android:layout_width="395dp"
+        android:layout_width="@dimen/text_view_width"
         android:layout_height="wrap_content"
         android:id="@+id/textView2"
         android:layout_weight="0.76"
         android:gravity="center|top"
-        android:textSize="30sp" />
+        android:textSize="@dimen/text_size" />
 
     <Button
         android:layout_width="162dp"
         android:layout_height="wrap_content"
-        android:text="Reset"
+        android:text="@string/reset"
         android:id="@+id/resetButton"
         android:layout_gravity="center_horizontal"
         android:layout_weight="0.11" />
