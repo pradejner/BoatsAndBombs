@@ -2,11 +2,12 @@ package com.peakey.ggj2017.waveyboat;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -19,16 +20,15 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.SurfaceView;
-import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.Context.SENSOR_SERVICE;
+import static com.peakey.ggj2017.waveyboat.HighScores.HIGH_SCORES;
 
 /**
  * @autor rhankins
@@ -70,6 +70,7 @@ public class GameView extends SurfaceView implements SensorEventListener {
 
     private long currentTime;
     private long deltaTime;
+    private SharedPreferences highScore;
 
     private Boolean blnPlaneMovingRight = true;
     private float fltPlaneRate = PLANE_INIT_RATE;
@@ -126,6 +127,8 @@ public class GameView extends SurfaceView implements SensorEventListener {
         mpBackground = MediaPlayer.create(this.context, R.raw.background_music);
         mpBackground.setLooping(true);
         //try { mpBackground.prepare(); } catch (IOException ex) { }
+        highScore = context.getSharedPreferences(HIGH_SCORES, 0);
+        sensorManager = (SensorManager) context.getSystemService(SENSOR_SERVICE);
         mpExplode = new MediaPlayer[10];
         mpSplash = new MediaPlayer[10];
         for (int i = 0; i < mpExplode.length; i++) {
@@ -244,8 +247,22 @@ public class GameView extends SurfaceView implements SensorEventListener {
                     {
                         imgLives1.setImageResource(R.drawable.heart_dead);
                         GameOver();
+                        SharedPreferences.Editor scoreEdit = highScore.edit();
+                        String scores = highScore.getString("highScores", "");
+                        if (scores.length() > 0) {
+                            if (score > Integer.parseInt(scores)) {
+                                scoreEdit.putString("highScores", scores + "" + score);
+                                scoreEdit.commit();
+                            }
+                        }
+                        else {
+                                scoreEdit.putString("highScores", scores + "" + score);
+                                scoreEdit.commit();
+                            }
                     }
                 });
+                Intent gameIntent = new Intent(this.getContext(), GameOver.class);
+                this.getContext().startActivity(gameIntent);
                 break;
         }
     }
