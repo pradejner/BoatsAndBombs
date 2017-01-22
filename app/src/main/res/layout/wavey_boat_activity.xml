@@ -25,12 +25,7 @@
         android:background="@android:color/transparent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="32dp"
-        android:layout_centerHorizontal="true"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"></LinearLayout>
+        android:layout_marginTop="32dp" />
 
     <LinearLayout
         android:id="@+id/bottom_bar"
@@ -46,23 +41,23 @@
             android:layout_height="wrap_content"
             android:layout_weight="4"
             android:orientation="horizontal">
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/heart_live"
-                android:layout_margin="5dp"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/liveheart"
+            android:layout_margin="5dp"/>
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/heart_live"
-                android:layout_margin="5dp"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/liveheart"
+            android:layout_margin="5dp"/>
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/heart_dead"
-                android:layout_margin="5dp"/>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/liveheart"
+            android:layout_margin="5dp"/>
         </LinearLayout>
 
         <TextView
