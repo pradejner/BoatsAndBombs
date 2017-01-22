@@ -21,4 +21,7 @@
     <dimen name="main_menu_button_width">162dp</dimen>
     <dimen name="high_score_text_size">30sp</dimen>
     <dimen name="current_score_text_size">30sp</dimen>
+    <dimen name="highscores_text_size_2">70sp</dimen>
+    <dimen name="text_size">30sp</dimen>
+    <dimen name="text_view_width">395dp</dimen>
 </resources>

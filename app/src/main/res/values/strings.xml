@@ -20,4 +20,6 @@
     <string name="main_menu_button_text">Main Menu</string>
     <string name="play_again_button_text">Play Again</string>
     <string name="game_over_text">Game Over</string>
+    <string name="reset">Reset</string>
+    <string name="high_scores">High Scores</string>
 </resources>
