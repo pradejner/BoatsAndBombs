@@ -5,10 +5,13 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 
 public class WaveyBoatActivity extends Activity {
     private WaveView backgroundWaveView;
     private WaveView frontWaveView;
+
+    private LinearLayout bottomBar;
 
     private WaveHelper backgroundWaveHelper;
     private WaveHelper frontWaveHelper;
@@ -30,6 +33,8 @@ public class WaveyBoatActivity extends Activity {
         frontWaveView = (WaveView) findViewById(R.id.front_wave);
         game = (GameView) findViewById(R.id.game);
 
+        bottomBar = (LinearLayout) findViewById(R.id.bottom_bar);
+
         setAttributesOfWave(backgroundWaveView);
         setAttributesOfWave(frontWaveView);
 
@@ -45,6 +50,8 @@ public class WaveyBoatActivity extends Activity {
         frontWaveHelper = new WaveHelper(frontWaveView);
 
          game = (GameView) findViewById(R.id.game);
+        frontWaveView.bringToFront();
+        bottomBar.bringToFront();
     }
 
     @Override
