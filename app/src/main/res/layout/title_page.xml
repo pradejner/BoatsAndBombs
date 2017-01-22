@@ -10,30 +10,30 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="WAVEY BOAT"
-        android:textSize="60sp"
+        android:text="@string/boats_and_bombs_text"
+        android:textSize="@dimen/title_text_size"
         android:layout_gravity="center_horizontal"/>
 
     <Button
         android:id="@+id/start_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start Game"
-        android:textSize="30sp"
+        android:text="@string/start_game_text"
+        android:textSize="@dimen/start_game_text_size"
         android:layout_gravity="center"/>
 
     <Button
         android:id="@+id/scores_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="HighScore"
-        android:textSize="30sp"
+        android:text="@string/highscores_text"
+        android:textSize="@dimen/highscores_text_size"
         android:layout_gravity="center"/>
     <Button
         android:id="@+id/credits_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Credits"
-        android:textSize="30sp"
+        android:text="@string/credits_text"
+        android:textSize="@dimen/credits_text_size"
         android:layout_gravity="center"/>
 </LinearLayout>
