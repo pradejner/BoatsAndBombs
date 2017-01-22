@@ -24,6 +24,7 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,13 +42,15 @@ public class GameView extends SurfaceView implements SensorEventListener {
 
     private List<Bomb> bombs;
     private Context context;
-    private GameLoopThread thdGameLoop;
+    private GameLoopThread thdGameDrawLoop;
+    private Thread thdGameLoop;
     private ImageView imgLives3;
     private ImageView imgLives2;
     private ImageView imgLives1;
     private TextView txtScore;
     private Activity refActivity;
 
+    private MediaPlayer mpBackground;
     private MediaPlayer mpExplode[];
     private MediaPlayer mpSplash[];
     private int intExplode;
@@ -112,13 +115,18 @@ public class GameView extends SurfaceView implements SensorEventListener {
         display = windowManager.getDefaultDisplay();
         size = new Point();
 
+        mpBackground = MediaPlayer.create(this.context, R.raw.background_music);
+        mpBackground.setLooping(true);
+        //try { mpBackground.prepare(); } catch (IOException ex) { }
         mpExplode = new MediaPlayer[10];
         mpSplash = new MediaPlayer[10];
         for (int i = 0; i < mpExplode.length; i++) {
             mpExplode[i] = MediaPlayer.create(this.context, R.raw.short_explosion);
             mpExplode[i].setVolume(1f, 1f);
+            //try { mpExplode[i].prepare(); } catch (IOException ex) { }
             mpSplash[i] = MediaPlayer.create(this.context, R.raw.splash);
             mpSplash[i].setVolume(0.2f, 0.2f);
+            //try { mpSplash[i].prepare(); } catch (IOException ex) { }
         }
         intExplode = -1;
         intSplash = -1;
@@ -148,12 +156,12 @@ public class GameView extends SurfaceView implements SensorEventListener {
         rctPlaneSource = new Rect(0, 0, planeWidth, planeHeight);
         rctPlaneDest = new Rect(0, 0, planeWidth, planeHeight);
 
-        thdGameLoop = new GameLoopThread(this);
+        thdGameDrawLoop = new GameLoopThread(this);
         resume();
-        lastTime = System.currentTimeMillis();
-        thdGameLoop.start();
+        lastTime = 0;
+        thdGameDrawLoop.start();
 
-        Thread thd = new Thread() {
+        thdGameLoop = new Thread() {
             @Override
             public void run() {
                 try {
@@ -162,7 +170,6 @@ public class GameView extends SurfaceView implements SensorEventListener {
                         score += 1;
                         fltBombLikelyHood -= 0.0001;
                         fltBombAcceleration += 0.001;
-
                     }
                 }
                 catch (InterruptedException ex) {
@@ -170,7 +177,6 @@ public class GameView extends SurfaceView implements SensorEventListener {
                 }
             }
         };
-        thd.start();
     }
 
     public void applyActivity(Activity activity) {
@@ -241,10 +247,10 @@ public class GameView extends SurfaceView implements SensorEventListener {
 
     public void destroy() {
         boolean retry = true;
-        thdGameLoop.setRunning(false);
+        thdGameDrawLoop.setRunning(false);
         while (retry) {
             try {
-                thdGameLoop.join();
+                thdGameDrawLoop.join();
                 retry = false;
             }
             catch (InterruptedException e) {
@@ -253,12 +259,20 @@ public class GameView extends SurfaceView implements SensorEventListener {
     }
 
     public void pause() {
-        thdGameLoop.setRunning(false);
+        try { thdGameLoop.join(); } catch (Exception ex) { }
+        thdGameDrawLoop.setRunning(false);
+        mpBackground.stop();
     }
 
 
     public void resume() {
-        thdGameLoop.setRunning(true);
+        thdGameDrawLoop.setRunning(true);
+        if (this.canvas != null)
+        {
+            lastTime = System.currentTimeMillis();
+            thdGameLoop.start();
+            mpBackground.start();
+        }
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), sensorManager.SENSOR_DELAY_UI);
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), sensorManager.SENSOR_DELAY_UI);
     }
@@ -268,10 +282,22 @@ public class GameView extends SurfaceView implements SensorEventListener {
     }
 
     public void Draw(Canvas canvas){
-        if (null != canvas ) { // && this.canvas != canvas) {
+        if (null != canvas ) {
             this.canvas = canvas;
             canvasWidth = canvas.getWidth();
             canvasHeight = canvas.getHeight();
+        }
+        if (lastTime == 0)
+        {   //everything is running now, games should actually start
+            thdGameLoop.start();
+            refActivity.runOnUiThread(new Runnable(){
+                @Override
+                public void run()
+                {
+                    mpBackground.start();
+                }
+            });
+            lastTime = System.currentTimeMillis();
         }
         currentTime = System.currentTimeMillis();
         deltaTime = currentTime - lastTime;
