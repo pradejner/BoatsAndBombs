@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.hardware.Sensor;
@@ -37,9 +38,10 @@ public class GameView extends View implements SensorEventListener {
     private Bitmap boat;
 
     private Boolean blnPlaneMovingRight = true;
-    private float fltPlaneRate = 10;
+    private float fltPlaneRate = 0.5f;
     private float fltBombLikelyHood = 0.99f;
     private Bitmap bmpPlane;
+    private Bitmap bmpPlaneReverse;
     Rect rctPlaneSource;
     Rect rctPlaneDest;
 
@@ -78,11 +80,17 @@ public class GameView extends View implements SensorEventListener {
 
         bmpPlane = BitmapFactory.decodeResource(context.getResources(), R.mipmap.plane);
         bmpPlane = Bitmap.createScaledBitmap(bmpPlane, 100, 100, false);
+        Matrix m = new Matrix();
+        m.preScale(-1, 1);
+        bmpPlaneReverse = Bitmap.createBitmap(bmpPlane, 0, 0, bmpPlane.getWidth(), bmpPlane.getHeight(), m, false);
+        bmpPlaneReverse.setDensity(DisplayMetrics.DENSITY_DEFAULT);
+
         rctPlaneSource = new Rect(0, 0, bmpPlane.getWidth(), bmpPlane.getHeight());
         rctPlaneDest = new Rect(0, 0, bmpPlane.getWidth(), bmpPlane.getHeight());
 
         thdGameLoop = new GameLoopThread(this);
         resume();
+        lastTime = System.currentTimeMillis();
         thdGameLoop.start();
     }
 
@@ -116,10 +124,20 @@ public class GameView extends View implements SensorEventListener {
         sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), sensorManager.SENSOR_DELAY_UI);
     }
 
+
+    private long lastTime;
+
+
     @Override
     protected void onDraw(Canvas canvas) {
-        drawPlane(canvas);
-        drawBombs(canvas);
+        long currentTime = System.currentTimeMillis();
+        long deltaTime = currentTime - lastTime;
+
+        drawPlane(canvas, deltaTime);
+        drawBoat(canvas, deltaTime);
+        drawBombs(canvas, deltaTime);
+
+        lastTime = currentTime;
     }
 
     public void stop() {
@@ -127,17 +145,26 @@ public class GameView extends View implements SensorEventListener {
         sensorManager.unregisterListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION));
     }
 
-    public void drawBoat(Canvas canvas) {
+    public void drawBoat(Canvas canvas, long deltaTime) {
+        boatPositionX += fltTilt * ((float)deltaTime / 1000);
+        if (boatPositionX < 0)
+        {
+            boatPositionX = 0;
+        }
+        else if (boatPositionX + boat.getWidth() > canvas.getWidth())
+        {
+            boatPositionX = canvas.getWidth() - boat.getWidth();
+        }
         boatSourceRect = new Rect(0, 0, boat.getWidth(), boat.getHeight());
-        boatDestRect = new Rect(boatPositionX, 0, boatPositionX + boat.getWidth(), boat.getHeight());
+        boatDestRect = new Rect(boatPositionX, 500, boatPositionX + boat.getWidth(), 500 + boat.getHeight());
 
         canvas.drawBitmap(boat, boatSourceRect, boatDestRect, null);
     }
 
-    private void drawPlane(Canvas canvas) {
+    private void drawPlane(Canvas canvas, long deltaTime) {
         Boolean blnCanBomb = true;
         if (blnPlaneMovingRight) {
-            rctPlaneDest.left += fltPlaneRate;
+            rctPlaneDest.left += fltPlaneRate * deltaTime;
             rctPlaneDest.right = rctPlaneDest.left + bmpPlane.getWidth();
             if (rctPlaneDest.left > canvas.getWidth()) {
                 blnCanBomb = false;
@@ -145,18 +172,19 @@ public class GameView extends View implements SensorEventListener {
                     blnPlaneMovingRight = false;
                 }
             }
+            canvas.drawBitmap(bmpPlane, rctPlaneSource, rctPlaneDest, null);
         }
         else {
-            rctPlaneDest.left -= fltPlaneRate;
-            rctPlaneDest.right = rctPlaneDest.left - bmpPlane.getWidth();
+            rctPlaneDest.left -= fltPlaneRate * deltaTime;
+            rctPlaneDest.right = rctPlaneDest.left + bmpPlane.getWidth();
             if (rctPlaneDest.left < 0) {
                 blnCanBomb = false;
                 if (rctPlaneDest.left < -bmpPlane.getWidth()) {
                     blnPlaneMovingRight = true;
                 }
             }
+            canvas.drawBitmap(bmpPlaneReverse, rctPlaneSource, rctPlaneDest, null);
         }
-        canvas.drawBitmap(bmpPlane, rctPlaneSource, rctPlaneDest, null);
         if (Math.random() > fltBombLikelyHood) {
             addBomb();
         }
@@ -180,19 +208,23 @@ public class GameView extends View implements SensorEventListener {
         bombs.add(bomb);
     }
 
-    private void drawBombs(Canvas canvas) {
+
+    private void drawBombs(Canvas canvas, long deltaTime) {
         for (int i = bombs.size() - 1; i >= 0; i--) {
             Bomb item = bombs.get(i);
-            item.draw(canvas);
+            item.draw(canvas, deltaTime);
         }
     }
+
+
+    private float fltTilt = 0;
 
     @Override
     public void onSensorChanged(SensorEvent event) {
         synchronized (this) {
             switch (event.sensor.getType()) {
                 case Sensor.TYPE_ACCELEROMETER:
-                    boatPositionX += (int) event.values[1];
+                    fltTilt = event.values[1] * 200;
                     break;
                 case Sensor.TYPE_ORIENTATION:
                     break;

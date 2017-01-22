@@ -99,12 +99,9 @@ public class Bomb
     public float getVelocityY() { return velocityY; }
 
 
-    public void draw(Canvas canvas)
+    public void draw(Canvas canvas, long deltaTime)
     {
-        long currentTime = System.currentTimeMillis();
-        long difference = currentTime - lastTime;
-
-        velocityY += (GRAVITY_ACCELERATION * ( (double)difference / 1000 ) );
+        velocityY += (GRAVITY_ACCELERATION * ( (double)deltaTime / 1000 ) );
 
         //assume bombs are 1 meter
         y += velocityY;
@@ -120,7 +117,6 @@ public class Bomb
                 splashHandler.callback(this);
             }
         }
-        lastTime = currentTime;
     }
 
 }
